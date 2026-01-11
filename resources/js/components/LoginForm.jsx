@@ -1,45 +1,66 @@
-import React from 'react';
+import React, { useState } from "react";
+import { Mail, Eye, EyeOff } from "lucide-react";
+import InputField from "../ui/InputField";
 
 export default function LoginForm() {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+
     return (
-        <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                Welcome back
-            </h3>
-            <p className="text-gray-500 mb-6">
-                Sign in to your account to continue
-            </p>
+        <div className="w-full max-w-md">
+            <div className="rounded-3xl border border-white/30 backdrop-blur-sm shadow-2xl px-8 py-10">
+                <div className="flex justify-center mb-10">
+                    <img
+                        src="/images/almar-hris-logo.svg"
+                        alt="Almar HRIS Logo"
+                        className="w-70 h-auto object-contain"
+                    />
+                </div>
 
-            <form className="space-y-4">
-                <div>
-                    <label className="block text-sm font-medium mb-1">
-                        Email
-                    </label>
-                    <input
+                <div className="mb-8 text-start">
+                    <h2 className="text-white text-2xl md:text-4xl font-bold pb-5">
+                        Welcome.
+                    </h2>
+                    <h2 className="text-white text-sm md:text-sm font-light">
+                        Sign in to access your account
+                    </h2>
+                </div>
+
+                <form className="space-y-4">
+                    <InputField
+                        label="Email"
                         type="email"
-                        placeholder="Enter your email"
-                        className="w-full rounded-lg border px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none"
+                        placeholder="john.doe@almar.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        rightIcon={Mail}
                     />
-                </div>
 
-                <div>
-                    <label className="block text-sm font-medium mb-1">
-                        Password
-                    </label>
-                    <input
+                    <InputField
+                        label="Password"
                         type="password"
-                        placeholder="Enter your password"
-                        className="w-full rounded-lg border px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        isPassword={true}
+                        showPassword={showPassword}
+                        togglePassword={() => setShowPassword((prev) => !prev)}
+                        rightIcon={showPassword ? EyeOff : Eye}
                     />
-                </div>
 
-                <button
-                    type="submit"
-                    className="w-full bg-emerald-600 text-white py-3 rounded-lg font-medium hover:bg-emerald-700 transition"
-                >
-                    Sign In →
-                </button>
-            </form>
+                    <div className="flex gap-4 pt-6">
+                        <button
+                            type="submit"
+                            className="relative overflow-hidden flex-1 bg-[#153f73] text-white py-3 rounded-2xl font-medium cursor-pointer transition-all duration-300 ease-out hover:bg-[#4988C4] hover:shadow-[0_12px_40px_rgba(73,136,196,0.45)] active:scale-[0.98]"
+                        >
+                            Log In
+                            <span className="pointer-events-none absolute inset-0 rounded-2xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.35)]"></span>
+                            <span className="pointer-events-none absolute bottom-0 right-0 h-full w-1/2 bg-linear-to-tr from-white/0 via-white/10 to-white/40 blur-2xl opacity-70"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 }
