@@ -9,7 +9,7 @@ export default function LoginForm() {
 
     return (
         <div className="w-full max-w-md">
-            <div className="rounded-3xl border border-white/30 backdrop-blur-sm shadow-2xl px-8 py-10">
+            <div className="rounded-3xl border border-glass-border-hover backdrop-blur-sm shadow-2xl px-8 py-10">
                 <div className="flex justify-center mb-10">
                     <img
                         src="/images/almar-hris-logo.svg"
@@ -19,10 +19,10 @@ export default function LoginForm() {
                 </div>
 
                 <div className="mb-8 text-start">
-                    <h2 className="text-white text-2xl md:text-4xl font-bold pb-5">
+                    <h2 className="text-text-primary text-2xl md:text-4xl font-bold pb-5">
                         Welcome.
                     </h2>
-                    <h2 className="text-white text-sm md:text-sm font-light">
+                    <h2 className="text-text-secondary text-sm md:text-sm font-light">
                         Sign in to access your account
                     </h2>
                 </div>
@@ -52,7 +52,7 @@ export default function LoginForm() {
                     <div className="flex gap-4 pt-6">
                         <button
                             type="submit"
-                            className="relative overflow-hidden flex-1 bg-[#153f73] text-white py-3 rounded-2xl font-medium cursor-pointer transition-all duration-300 ease-out hover:bg-[#4988C4] hover:shadow-[0_12px_40px_rgba(73,136,196,0.45)] active:scale-[0.98]"
+                            className="relative overflow-hidden flex-1 bg-brand-primary text-text-primary py-3 rounded-2xl font-medium cursor-pointer transition-all duration-300 ease-out hover:bg-brand-primary-hover hover:shadow-[0_12px_40px_var(--color-shadow-primary)] active:scale-[0.98]"
                         >
                             Log In
                             <span className="pointer-events-none absolute inset-0 rounded-2xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.35)]"></span>
