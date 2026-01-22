@@ -19,7 +19,7 @@
     /* Primary Brand Color - Main company color */
     --color-brand-primary: #153f73;
     --color-brand-primary-hover: #4988C4;
-    --color-brand-primary-light: #5a9ed6;
+    --color-brand-primary-light: #f9fafb;
     --color-brand-primary-dark: #0d2847;
 
     /* Primary color with opacity variants */
@@ -84,6 +84,7 @@
     --color-text-muted: #6b7280;
     --color-text-placeholder: #4b5563;
     --color-text-disabled: #374151;
+    --color-text-dark: #1f1f1f;
 
     /* ================================================
          * BORDER COLORS
@@ -133,7 +134,7 @@
   /* Brand Colors */
   --color-brand-primary: #153f73;
   --color-brand-primary-hover: #4988C4;
-  --color-brand-primary-light: #5a9ed6;
+  --color-brand-primary-light: #f9fafb;
   --color-brand-primary-dark: #0d2847;
 
   /* Semantic Colors */
@@ -155,6 +156,7 @@
   --color-text-secondary: #d1d5db;
   --color-text-tertiary: #9ca3af;
   --color-text-muted: #6b7280;
+  --color-text-dark: #1f1f1f;
 
   /* Glass */
   --color-glass-border: rgb(255 255 255 / 0.2);

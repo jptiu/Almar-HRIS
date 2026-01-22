@@ -2,12 +2,11 @@ import React, { useState } from "react";
 import LoginForm from "../components/LoginForm";
 
 export default function Home() {
-
     return (
-        <div className="min-h-screen bg-linear-to-br from-[#1e3a5f] via-[#2c4a6f] to-[#1e2f4d] relative overflow-hidden">
+        <div className="min-h-screen bg-linear-to-br from-brand-primary-dark via-brand-primary to-brand-primary-dark relative overflow-hidden">
             <div className="absolute inset-0 opacity-10">
                 <img
-                    src="https://images.unsplash.com/photo-1767893029384-e340a44073b3?w=1920&h=1080&fit=crop"
+                    src="/images/main-bg.jpeg"
                     alt="Background"
                     className="w-full h-full object-cover"
                 />
