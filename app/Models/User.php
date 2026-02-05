@@ -19,9 +19,9 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
         'email',
         'password',
+        'is_active',
     ];
 
     /**
@@ -42,8 +42,34 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
+            'is_active' => 'boolean',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+/**
+     * Get the roles that belong to the user.
+     */
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'user_roles')->withTimestamps();
+    }
+
+    /**
+     * Get the employee associated with the user.
+     */
+    public function employee()
+    {
+        return $this->hasOne(Employee::class);
+    }
+
+    /**
+     * Get the HR manager record associated with the user.
+     */
+    public function hrManager()
+    {
+        return $this->hasOne(HrManager::class);
     }
 }
