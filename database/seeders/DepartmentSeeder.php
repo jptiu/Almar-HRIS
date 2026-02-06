@@ -15,12 +15,14 @@ class DepartmentSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create Human Resources Department
-        Department::create([
-            'name' => 'Human Resources',
-            'description' => 'Responsible for recruitment, employee relations, training, and HR operations.',
-            'created_by' => 1, // Assuming admin user exists with ID 1
-        ]);
+        Department::updateOrCreate(
+            ['name' => 'Human Resources'],
+            [
+                'name' => 'Human Resources',
+                'description' => 'Responsible for recruitment, employee relations, training, and HR operations.',
+                'created_by' => 1,
+            ]
+        );
     }
 }
 

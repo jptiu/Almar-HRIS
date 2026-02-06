@@ -15,11 +15,14 @@ class BranchSeeder extends Seeder
      */
     public function run(): void
     {
-        Branch::create([
-            'company_id' => 1,
-            'name' => 'Main Office',
-            'address' => '123 Main Street, City',
-        ]);
+        Branch::updateOrCreate(
+            ['name' => 'Main Office', 'company_id' => 1],
+            [
+                'company_id' => 1,
+                'name' => 'Main Office',
+                'address' => '123 Main Street, City',
+            ]
+        );
     }
 }
 

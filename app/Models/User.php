@@ -6,12 +6,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -49,7 +48,7 @@ class User extends Authenticatable
         ];
     }
 
-/**
+    /**
      * Get the roles that belong to the user.
      */
     public function roles()
@@ -64,12 +63,5 @@ class User extends Authenticatable
     {
         return $this->hasOne(Employee::class);
     }
-
-    /**
-     * Get the HR manager record associated with the user.
-     */
-    public function hrManager()
-    {
-        return $this->hasOne(HrManager::class);
-    }
 }
+

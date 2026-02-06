@@ -15,10 +15,13 @@ class CompanySeeder extends Seeder
      */
     public function run(): void
     {
-        Company::create([
-            'name' => 'Almar Corporation',
-            'email' => 'contact@almar.com',
-            'phone' => '+63 912 345 6789',
-        ]);
+        Company::updateOrCreate(
+            ['email' => 'contact@almar.com'],
+            [
+                'name' => 'Almar Corporation',
+                'email' => 'contact@almar.com',
+                'phone' => '+63 912 345 6789',
+            ]
+        );
     }
 }

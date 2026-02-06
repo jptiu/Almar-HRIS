@@ -17,25 +17,46 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // Create Admin User
-        $admin = User::factory()->create([
-            'email' => 'admin@almar.com',
-            'is_active' => true,
-        ]);
-        $admin->roles()->attach(Role::where('name', 'admin')->first());
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@almar.com'],
+            [
+                'email' => 'admin@almar.com',
+                'password' => bcrypt('password'),
+                'is_active' => true,
+            ]
+        );
+        $adminRole = Role::where('name', 'admin')->first();
+        if ($adminRole && !$admin->roles()->exists()) {
+            $admin->roles()->attach($adminRole);
+        }
 
         // Create HR Manager User
-        $hr = User::factory()->create([
-            'email' => 'hr@almar.com',
-            'is_active' => true,
-        ]);
-        $hr->roles()->attach(Role::where('name', 'hr_manager')->first());
+        $hr = User::firstOrCreate(
+            ['email' => 'hr@almar.com'],
+            [
+                'email' => 'hr@almar.com',
+                'password' => bcrypt('password'),
+                'is_active' => true,
+            ]
+        );
+        $hrRole = Role::where('name', 'hr_manager')->first();
+        if ($hrRole && !$hr->roles()->exists()) {
+            $hr->roles()->attach($hrRole);
+        }
 
         // Create Employee User
-        $employee = User::factory()->create([
-            'email' => 'employee@almar.com',
-            'is_active' => true,
-        ]);
-        $employee->roles()->attach(Role::where('name', 'employee')->first());
+        $employee = User::firstOrCreate(
+            ['email' => 'employee@almar.com'],
+            [
+                'email' => 'employee@almar.com',
+                'password' => bcrypt('password'),
+                'is_active' => true,
+            ]
+        );
+        $employeeRole = Role::where('name', 'employee')->first();
+        if ($employeeRole && !$employee->roles()->exists()) {
+            $employee->roles()->attach($employeeRole);
+        }
     }
 }
 

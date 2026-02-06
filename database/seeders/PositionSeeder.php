@@ -15,12 +15,14 @@ class PositionSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create HR Manager position under Human Resources department
-        Position::create([
-            'department_id' => 1, // Human Resources department
-            'title' => 'HR Manager',
-            'level' => 'senior',
-        ]);
+        Position::updateOrCreate(
+            ['title' => 'HR Manager', 'department_id' => 1],
+            [
+                'department_id' => 1,
+                'title' => 'HR Manager',
+                'level' => 'senior',
+            ]
+        );
     }
 }
 
