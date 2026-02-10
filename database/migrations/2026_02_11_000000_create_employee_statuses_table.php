@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('employee_statuses', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('email', 100)->unique();
-            $table->string('password', 255);
-            $table->boolean('is_active')->default(true);
+            $table->string('name', 50)->unique();
+            $table->string('description', 255)->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
         });
@@ -26,6 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('employee_statuses');
     }
 };
+

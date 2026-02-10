@@ -4,78 +4,64 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 use App\Models\User;
 
 class AuthController extends Controller
 {
     /**
-     * Register new user
-     */
-    public function register(Request $request)
-    {
-        // Validate request
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed', // needs password_confirmation field
-        ]);
-
-        // Create user
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        // Create token
-        $token = $user->createToken('api-token')->plainTextToken;
-
-        return response()->json([
-            'user' => $user,
-            'token' => $token,
-        ], 201);
-    }
-
-    /**
      * Login user
      */
     public function login(Request $request)
     {
-        // Validate request
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
+        try {
+            // Validate request
+            $validated = $request->validate([
+                'email' => 'required|email',
+                'password' => 'required|string',
+            ]);
 
-        // Find user
-        $user = User::where('email', $request->email)->first();
+            // Find user
+            $user = User::where('email', $validated['email'])->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json([
-                'message' => 'Invalid credentials'
-            ], 401);
+            if (!$user || !Hash::check($validated['password'], $user->password)) {
+                return $this->unauthorized('Invalid credentials');
+            }
+
+            // Login user via session
+            Auth::login($user);
+
+            // Regenerate session to prevent session fixation
+            $request->session()->regenerate();
+
+            // Load roles for the user
+            $user->load('roles');
+
+            return $this->success([
+                'user' => $user,
+            ], 'Login successful');
+        } catch (ValidationException $e) {
+            return $this->validationError($e->errors());
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Login Error: ' . $e->getMessage(), [
+                'exception' => $e->getTraceAsString(),
+            ]);
+            
+            return $this->serverError('An error occurred during login');
         }
-
-        // Create token
-        $token = $user->createToken('api-token')->plainTextToken;
-
-        return response()->json([
-            'user' => $user,
-            'token' => $token,
-        ]);
     }
 
     /**
-     * Logout user (revoke current token)
+     * Logout user (invalidate session)
      */
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
-
-        return response()->json([
-            'message' => 'Logged out successfully'
-        ]);
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return $this->success(null, 'Logged out successfully');
     }
 
     /**
@@ -83,6 +69,8 @@ class AuthController extends Controller
      */
     public function me(Request $request)
     {
-        return response()->json($request->user());
+        $user = $request->user()->load('roles');
+        return $this->success(['user' => $user], 'User retrieved successfully');
     }
 }
+

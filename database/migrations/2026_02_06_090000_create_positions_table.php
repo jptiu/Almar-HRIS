@@ -11,13 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('positions', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('email', 100)->unique();
-            $table->string('password', 255);
-            $table->boolean('is_active')->default(true);
+            $table->unsignedBigInteger('department_id');
+            $table->string('title', 150);
+            $table->string('level', 50)->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
+
+            $table->foreign('department_id')->references('id')->on('departments')->onDelete('cascade');
+            $table->unique(['department_id', 'title']);
         });
     }
 
@@ -26,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('positions');
     }
 };
