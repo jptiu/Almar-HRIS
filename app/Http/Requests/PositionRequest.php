@@ -22,8 +22,9 @@ class PositionRequest extends FormRequest
      */
     public function rules(): array
     {
-        $positionId = $this->route('position')?->id;
+        $positionId = $this->route('id');
         $departmentId = $this->input('department_id');
+        $positionLevelId = $this->input('position_level_id');
         
         return [
             'department_id' => 'required|exists:departments,id',
@@ -31,12 +32,13 @@ class PositionRequest extends FormRequest
                 'required',
                 'string',
                 'max:150',
-                Rule::unique('positions')->where(function ($query) use ($departmentId) {
+                Rule::unique('positions')->where(function ($query) use ($departmentId, $positionLevelId) {
                     return $query->where('department_id', $departmentId)
-                        ->whereRaw('LOWER(title) = ?', [strtolower($this->title)]);
+                        ->whereRaw('LOWER(title) = ?', [strtolower($this->title)])
+                        ->where('position_level_id', $positionLevelId);
                 })->ignore($positionId)
             ],
-            'level' => 'nullable|string|max:50',
+            'position_level_id' => 'nullable|exists:position_levels,id',
         ];
     }
 
@@ -52,8 +54,9 @@ class PositionRequest extends FormRequest
             'department_id.exists' => 'The specified department does not exist.',
             'title.required' => 'The position title is required.',
             'title.max' => 'The position title cannot exceed 150 characters.',
-            'level.max' => 'The position level cannot exceed 50 characters.',
+            'position_level_id.exists' => 'The specified position level does not exist.',
         ];
     }
 }
+
 

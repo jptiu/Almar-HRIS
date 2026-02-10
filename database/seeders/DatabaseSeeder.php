@@ -18,10 +18,12 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(RoleSeeder::class);
         $this->call(UserSeeder::class);
+        $this->call(PositionLevelSeeder::class);
         $this->call(DepartmentSeeder::class);
         $this->call(CompanySeeder::class);
         $this->call(BranchSeeder::class);
         $this->call(PositionSeeder::class);
+        $this->call(EmployeeStatusSeeder::class);
         $this->call(EmployeeSeeder::class);
     }
 }

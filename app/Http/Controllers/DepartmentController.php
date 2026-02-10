@@ -17,10 +17,11 @@ class DepartmentController extends Controller
         $department = Department::create([
             'name' => $request->name,
             'description' => $request->description,
+            'company_id' => $request->company_id,
             'created_by' => $request->user()->id,
         ]);
 
-        return $this->created(['department' => $department], 'Department created successfully.');
+        return $this->created(['department' => $department->load('company')], 'Department created successfully.');
     }
 
     /**
@@ -28,7 +29,7 @@ class DepartmentController extends Controller
      */
     public function index(): JsonResponse
     {
-        $departments = Department::with(['positions', 'creator'])->get();
+        $departments = Department::with(['positions', 'creator', 'company'])->get();
         return $this->success(['departments' => $departments], 'Departments retrieved successfully.');
     }
 
@@ -38,7 +39,7 @@ class DepartmentController extends Controller
     public function show($id): JsonResponse
     {
         $department = Department::findOrFail($id);
-        $department->load(['positions', 'creator']);
+        $department->load(['positions', 'creator', 'company']);
         return $this->success(['department' => $department], 'Department retrieved successfully.');
     }
 
@@ -51,6 +52,7 @@ class DepartmentController extends Controller
         $department->update([
             'name' => $request->name,
             'description' => $request->description,
+            'company_id' => $request->company_id,
         ]);
 
         return $this->success(['department' => $department], 'Department updated successfully.');

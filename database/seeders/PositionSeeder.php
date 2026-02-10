@@ -20,7 +20,7 @@ class PositionSeeder extends Seeder
             [
                 'department_id' => 1,
                 'title' => 'HR Manager',
-                'level' => 'senior',
+                'position_level_id' => 6, // Manager level
             ]
         );
     }

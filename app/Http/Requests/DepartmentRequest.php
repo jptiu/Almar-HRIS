@@ -22,7 +22,7 @@ class DepartmentRequest extends FormRequest
      */
     public function rules(): array
     {
-        $departmentId = $this->route('department')?->id;
+        $departmentId = $this->route('id');
         
         return [
             'name' => [
@@ -30,10 +30,14 @@ class DepartmentRequest extends FormRequest
                 'string',
                 'max:150',
                 Rule::unique('departments')->where(function ($query) {
-                    return $query->whereRaw('LOWER(name) = ?', [strtolower($this->name)]);
+                    return $query->whereRaw('LOWER(name) = ?', [strtolower($this->name)])
+                        ->when($this->company_id, function ($q) {
+                            return $q->where('company_id', $this->company_id);
+                        });
                 })->ignore($departmentId)
             ],
             'description' => 'nullable|string|max:1000',
+            'company_id' => 'nullable|exists:companies,id',
         ];
     }
 

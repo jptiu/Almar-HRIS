@@ -36,6 +36,9 @@ class AuthController extends Controller
             // Regenerate session to prevent session fixation
             $request->session()->regenerate();
 
+            // Load roles for the user
+            $user->load('roles');
+
             return $this->success([
                 'user' => $user,
             ], 'Login successful');
@@ -66,7 +69,8 @@ class AuthController extends Controller
      */
     public function me(Request $request)
     {
-        return $this->success($request->user(), 'User retrieved successfully');
+        $user = $request->user()->load('roles');
+        return $this->success(['user' => $user], 'User retrieved successfully');
     }
 }
 

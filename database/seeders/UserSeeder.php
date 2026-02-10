@@ -30,18 +30,18 @@ class UserSeeder extends Seeder
             $admin->roles()->attach($adminRole);
         }
 
-        // Create HR Manager User
-        $hr = User::firstOrCreate(
-            ['email' => 'hr@almar.com'],
+        // Create Manager User
+        $manager = User::firstOrCreate(
+            ['email' => 'manager@almar.com'],
             [
-                'email' => 'hr@almar.com',
+                'email' => 'manager@almar.com',
                 'password' => bcrypt('password'),
                 'is_active' => true,
             ]
         );
-        $hrRole = Role::where('name', 'hr_manager')->first();
-        if ($hrRole && !$hr->roles()->exists()) {
-            $hr->roles()->attach($hrRole);
+        $managerRole = Role::where('name', 'manager')->first();
+        if ($managerRole && !$manager->roles()->exists()) {
+            $manager->roles()->attach($managerRole);
         }
 
         // Create Employee User

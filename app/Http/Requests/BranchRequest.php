@@ -22,7 +22,7 @@ class BranchRequest extends FormRequest
      */
     public function rules(): array
     {
-        $branchId = $this->route('branch')?->id;
+        $branchId = $this->route('id');
         $companyId = $this->input('company_id');
         
         return [

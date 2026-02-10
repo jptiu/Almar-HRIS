@@ -13,17 +13,27 @@ class Employee extends Model
         'company_id',
         'branch_id',
         'position_id',
+        'manager_id',
+        'employee_status_id',
         'first_name',
         'last_name',
         'middle_name',
-        'employee_number',
+        'address_line_1',
+        'address_line_2',
+        'city',
+        'state',
+        'postal_code',
+        'country',
+        'phone',
         'hire_date',
-        'status',
+        'birthdate',
+        'base_salary',
     ];
 
     protected $casts = [
         'hire_date' => 'date',
-        'status' => 'string',
+        'birthdate' => 'date',
+        'base_salary' => 'decimal:2',
     ];
 
     public function user()
@@ -49,5 +59,29 @@ class Employee extends Model
     public function position()
     {
         return $this->belongsTo(Position::class);
+    }
+
+    /**
+     * Get the manager of this employee.
+     */
+    public function manager()
+    {
+        return $this->belongsTo(Employee::class, 'manager_id');
+    }
+
+    /**
+     * Get the subordinates of this employee.
+     */
+    public function subordinates()
+    {
+        return $this->hasMany(Employee::class, 'manager_id');
+    }
+
+    /**
+     * Get the employment status of this employee.
+     */
+    public function status()
+    {
+        return $this->belongsTo(EmployeeStatus::class, 'employee_status_id');
     }
 }
