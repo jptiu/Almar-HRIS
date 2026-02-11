@@ -30,6 +30,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('me')->group(function () {
         // Current user info
         Route::get('/', [AuthController::class, 'me']);
+        Route::put('/', [AuthController::class, 'updateProfile']);
         Route::post('/logout', [AuthController::class, 'logout']);
 
         // Documents (full CRUD)
