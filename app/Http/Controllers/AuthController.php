@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use App\Models\User;
+use App\Http\Resources\UserResource;
+use App\Http\Resources\UserLoginResource;
+use App\Http\Requests\UpdateMyProfileRequest;
 
 class AuthController extends Controller
 {
@@ -17,31 +19,25 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         try {
-            // Validate request
             $validated = $request->validate([
                 'email' => 'required|email',
                 'password' => 'required|string',
             ]);
 
-            // Find user
             $user = User::where('email', $validated['email'])->first();
 
             if (!$user || !Hash::check($validated['password'], $user->password)) {
                 return $this->unauthorized('Invalid credentials');
             }
 
-            // Login user via session
             Auth::login($user);
-
-            // Regenerate session to prevent session fixation
             $request->session()->regenerate();
 
-            // Load roles and employee data with relationships for the user
-            $user->load(['roles', 'employee.position', 'employee.department', 'employee.branch', 'employee.company']);
+            $user->load(['roles', 'employee.position', 'employee.department', 'employee.branch', 'employee.company', 'employee.status']);
 
-            return $this->success([
-                'user' => $user,
-            ], 'Login successful');
+            // Return flattened resource (limited data for login response)
+            return $this->success(new UserLoginResource($user), 'Login successful');
+
         } catch (ValidationException $e) {
             return $this->validationError($e->errors());
         } catch (\Exception $e) {
@@ -69,8 +65,63 @@ class AuthController extends Controller
      */
     public function me(Request $request)
     {
-        $user = $request->user()->load(['roles', 'employee.position', 'employee.department', 'employee.branch', 'employee.company']);
-        return $this->success(['user' => $user], 'User retrieved successfully');
+        $user = $request->user()->load(['roles', 'employee.position', 'employee.department', 'employee.branch', 'employee.company', 'employee.status']);
+        return $this->success(new UserResource($user), 'User retrieved successfully');
+    }
+
+    /**
+     * Update current user's profile
+     */
+    public function updateProfile(UpdateMyProfileRequest $request)
+    {
+        try {
+            $user = $request->user();
+            $validated = $request->validated();
+
+            // Update user fields (email, password)
+            if (isset($validated['email'])) {
+                $user->email = $validated['email'];
+            }
+            if (isset($validated['password'])) {
+                $user->password = Hash::make($validated['password']);
+            }
+            $user->save();
+
+            // Update employee personal info
+            if ($user->employee) {
+                $employeeFields = [
+                    'first_name',
+                    'middle_name',
+                    'last_name',
+                    'phone',
+                    'address_line_1',
+                    'address_line_2',
+                    'city',
+                    'state',
+                    'postal_code',
+                    'country',
+                ];
+
+                foreach ($employeeFields as $field) {
+                    if (isset($validated[$field])) {
+                        $user->employee->{$field} = $validated[$field];
+                    }
+                }
+                $user->employee->save();
+            }
+
+            // Reload relationships and return updated profile
+            $user->load(['roles', 'employee.position', 'employee.department', 'employee.branch', 'employee.company', 'employee.status']);
+
+            return $this->success(new UserResource($user), 'Profile updated successfully');
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Update Profile Error: ' . $e->getMessage(), [
+                'exception' => $e->getTraceAsString(),
+            ]);
+
+            return $this->serverError('An error occurred while updating profile');
+        }
     }
 }
 
