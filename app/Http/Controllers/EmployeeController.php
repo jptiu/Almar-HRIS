@@ -108,10 +108,10 @@ class EmployeeController extends Controller
     /**
      * Display the specified employee.
      */
-    public function show($id): JsonResponse
+    public function show($employee): JsonResponse
     {
         $employee = Employee::with(['user', 'company', 'branch', 'position', 'manager', 'creator', 'status'])
-            ->findOrFail($id);
+            ->findOrFail($employee);
 
         return $this->success(['employee' => $employee], 'Employee retrieved successfully.');
     }
@@ -121,10 +121,10 @@ class EmployeeController extends Controller
      * Also updates user role based on is_manager flag (admin only).
      * Managers can update employees but cannot change manager role.
      */
-    public function update(EmployeeRequest $request, $id): JsonResponse
+    public function update(EmployeeRequest $request, $employee): JsonResponse
     {
         try {
-            $employee = Employee::findOrFail($id);
+            $employee = Employee::findOrFail($employee);
 
             DB::beginTransaction();
 
@@ -208,9 +208,9 @@ class EmployeeController extends Controller
      * Remove the specified employee.
      * Only admin can delete employees.
      */
-    public function destroy($id): JsonResponse
+    public function destroy($employee): JsonResponse
     {
-        $employee = Employee::findOrFail($id);
+        $employee = Employee::findOrFail($employee);
 
         try {
             DB::beginTransaction();

@@ -36,9 +36,9 @@ class DepartmentController extends Controller
     /**
      * Display the specified department.
      */
-    public function show($id): JsonResponse
+    public function show($department): JsonResponse
     {
-        $department = Department::findOrFail($id);
+        $department = Department::findOrFail($department);
         $department->load(['positions', 'creator', 'company']);
         return $this->success(['department' => $department], 'Department retrieved successfully.');
     }
@@ -46,9 +46,9 @@ class DepartmentController extends Controller
     /**
      * Update the specified department.
      */
-    public function update(DepartmentRequest $request, $id): JsonResponse
+    public function update(DepartmentRequest $request, $department): JsonResponse
     {
-        $department = Department::findOrFail($id);
+        $department = Department::findOrFail($department);
         $department->update([
             'name' => $request->name,
             'description' => $request->description,
@@ -61,9 +61,9 @@ class DepartmentController extends Controller
     /**
      * Remove the specified department.
      */
-    public function destroy($id): JsonResponse
+    public function destroy($department): JsonResponse
     {
-        $department = Department::findOrFail($id);
+        $department = Department::findOrFail($department);
         $department->delete();
         return $this->success(null, 'Department deleted successfully.');
     }
