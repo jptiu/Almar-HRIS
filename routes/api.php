@@ -11,6 +11,7 @@ use App\Http\Controllers\EmployeeStatusController;
 use App\Http\Controllers\PositionLevelController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\DocumentTypeController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -94,6 +95,36 @@ Route::middleware('auth')->group(function () {
             Route::get('documents', [DocumentController::class, 'index']); // list
             Route::get('documents/{document}', [DocumentController::class, 'show']); // view
             Route::get('documents/{document}/download', [DocumentController::class, 'download']); // download
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | Dashboard Analytics
+        |--------------------------------------------------------------------------
+        */
+        Route::prefix('dashboard')->group(function () {
+            // Complete dashboard overview
+            Route::get('/overview', [DashboardController::class, 'overview']);
+
+            // Statistics
+            Route::get('/stats', [DashboardController::class, 'stats']);
+
+            // Distribution endpoints (with percentages)
+            Route::get('/employees-by-status', [DashboardController::class, 'employeesByStatus']);
+            Route::get('/employees-by-department', [DashboardController::class, 'employeesByDepartment']);
+            Route::get('/employees-by-branch', [DashboardController::class, 'employeesByBranch']);
+            Route::get('/employees-by-position', [DashboardController::class, 'employeesByPosition']);
+
+            // Recent activity
+            Route::get('/recent-hires', [DashboardController::class, 'recentHires']);
+
+            // Trends
+            Route::get('/hiring-trends', [DashboardController::class, 'hiringTrends']);
+
+            // Salary analytics (admin only)
+            Route::middleware('role:admin')->group(function () {
+                Route::get('/salary-stats', [DashboardController::class, 'salaryStatsByDepartment']);
+            });
         });
     });
 });

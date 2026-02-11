@@ -31,4 +31,12 @@ class Position extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    /**
+     * Get the employees with this position.
+     */
+    public function employees()
+    {
+        return $this->hasMany(Employee::class);
+    }
 }
