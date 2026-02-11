@@ -9,83 +9,90 @@ use App\Http\Controllers\PositionController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\EmployeeStatusController;
 use App\Http\Controllers\PositionLevelController;
+use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\DocumentTypeController;
+
+/*
+|--------------------------------------------------------------------------
+| Authentication
+|--------------------------------------------------------------------------
+*/
 
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 Route::middleware('auth')->group(function () {
-    // Routes accessible to all authenticated users (including employee)
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/me', [AuthController::class, 'me']);
 
-    // Routes accessible to admin and manager only
+    /*
+    |--------------------------------------------------------------------------
+    | Employee Self-Service (/me)
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('me')->group(function () {
+        // Current user info
+        Route::get('/', [AuthController::class, 'me']);
+        Route::post('/logout', [AuthController::class, 'logout']);
+
+        // Documents (full CRUD)
+        Route::get('documents', [DocumentController::class, 'myDocuments']); // list
+        Route::post('documents', [DocumentController::class, 'storeMyDocument']); // upload
+        Route::get('documents/{document}', [DocumentController::class, 'showMyDocument']); // view
+        Route::put('documents/{document}', [DocumentController::class, 'updateMyDocument']); // update
+        Route::delete('documents/{document}', [DocumentController::class, 'deleteMyDocument']); // delete
+        Route::get('documents/{document}/download', [DocumentController::class, 'downloadMyDocument']); // download
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | System Reference Data (accessible by all authenticated users)
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/document-types', [DocumentTypeController::class, 'index']);
+    Route::get('/employee-statuses', [EmployeeStatusController::class, 'index']);
+    Route::get('/position-levels', [PositionLevelController::class, 'index']);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin & Manager Access
+    |--------------------------------------------------------------------------
+    */
     Route::middleware('role:admin,manager')->group(function () {
-        // Company routes (admin only)
-        Route::prefix('/companies')->group(function () {
-            // Read routes (admin and manager)
-            Route::get('/', [CompanyController::class, 'index']);
-            Route::get('/{id}', [CompanyController::class, 'show']);
-            
-            // Admin only routes
-            Route::middleware('role:admin')->group(function () {
-                Route::post('/', [CompanyController::class, 'store']);
-                Route::put('/{id}', [CompanyController::class, 'update']);
-                Route::delete('/{id}', [CompanyController::class, 'destroy']);
-            });
+
+        // Companies (read for manager)
+        Route::apiResource('companies', CompanyController::class)
+            ->except(['store', 'update', 'destroy']);
+        // Admin-only for create/update/delete
+        Route::middleware('role:admin')->group(function () {
+            Route::apiResource('companies', CompanyController::class)
+                ->only(['store', 'update', 'destroy']);
         });
 
-        // Branch routes (admin only)
-        Route::prefix('/branches')->group(function () {
-            // Read routes (admin and manager)
-            Route::get('/', [BranchController::class, 'index']);
-            Route::get('/{id}', [BranchController::class, 'show']);
-            
-            // Admin only routes
-            Route::middleware('role:admin')->group(function () {
-                Route::post('/', [BranchController::class, 'store']);
-                Route::put('/{id}', [BranchController::class, 'update']);
-                Route::delete('/{id}', [BranchController::class, 'destroy']);
-            });
+        // Branches (read for manager)
+        Route::apiResource('branches', BranchController::class)
+            ->except(['store', 'update', 'destroy']);
+        // Admin-only for create/update/delete
+        Route::middleware('role:admin')->group(function () {
+            Route::apiResource('branches', BranchController::class)
+                ->only(['store', 'update', 'destroy']);
         });
 
-        // Department routes
-        Route::prefix('/departments')->group(function () {
-            Route::get('/', [DepartmentController::class, 'index']);
-            Route::get('/{id}', [DepartmentController::class, 'show']);
-            Route::post('/', [DepartmentController::class, 'store']);
-            Route::put('/{id}', [DepartmentController::class, 'update']);
-            Route::delete('/{id}', [DepartmentController::class, 'destroy']);
-        });
+        // Departments (admin & manager full CRUD)
+        Route::apiResource('departments', DepartmentController::class);
 
-        // Position routes
-        Route::prefix('/positions')->group(function () {
-            Route::get('/', [PositionController::class, 'index']);
-            Route::post('/', [PositionController::class, 'store']);
-            
-            // Position Levels (nested under positions) - MUST come before /{id} parameter route
-            Route::get('/levels', [PositionLevelController::class, 'index']);
-            Route::get('/levels/{id}', [PositionLevelController::class, 'show']);
-            
-            // Position CRUD routes with {id} parameter - MUST come after specific nested routes
-            Route::get('/{id}', [PositionController::class, 'show']);
-            Route::put('/{id}', [PositionController::class, 'update']);
-            Route::delete('/{id}', [PositionController::class, 'destroy']);
-        });
+        // Positions (admin & manager full CRUD)
+        Route::apiResource('positions', PositionController::class);
 
-        // Employee routes
-        Route::prefix('/employees')->group(function () {
-            // Employee nested routes
-            Route::get('/', [EmployeeController::class, 'index']);
-            Route::post('/', [EmployeeController::class, 'store']);
-            
-            // Employee Statuses (nested under employees) - MUST come before /{id} parameter route
-            Route::get('/statuses', [EmployeeStatusController::class, 'index']);
-            Route::get('/statuses/{id}', [EmployeeStatusController::class, 'show']);
-            
-            // Employee CRUD routes with {id} parameter - MUST come after specific nested routes
-            Route::get('/{id}', [EmployeeController::class, 'show']);
-            Route::put('/{id}', [EmployeeController::class, 'update']);
-            Route::delete('/{id}', [EmployeeController::class, 'destroy']);
+        // Employees (admin & manager full CRUD)
+        Route::apiResource('employees', EmployeeController::class);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Admin/HR Employee Documents (read-only)
+        |--------------------------------------------------------------------------
+        */
+        Route::prefix('employees/{employee}')->group(function () {
+            Route::get('documents', [DocumentController::class, 'index']); // list
+            Route::get('documents/{document}', [DocumentController::class, 'show']); // view
+            Route::get('documents/{document}/download', [DocumentController::class, 'download']); // download
         });
     });
 });
-

@@ -35,9 +35,9 @@ class CompanyController extends Controller
     /**
      * Display the specified company.
      */
-    public function show($id): JsonResponse
+    public function show($company): JsonResponse
     {
-        $company = Company::findOrFail($id);
+        $company = Company::findOrFail($company);
         $company->load('branches');
         return $this->success(['company' => $company], 'Company retrieved successfully.');
     }
@@ -45,9 +45,9 @@ class CompanyController extends Controller
     /**
      * Update the specified company.
      */
-    public function update(CompanyRequest $request, $id): JsonResponse
+    public function update(CompanyRequest $request, $company): JsonResponse
     {
-        $company = Company::findOrFail($id);
+        $company = Company::findOrFail($company);
         $company->update([
             'name' => $request->name,
             'email' => $request->email,
@@ -60,9 +60,9 @@ class CompanyController extends Controller
     /**
      * Remove the specified company.
      */
-    public function destroy($id): JsonResponse
+    public function destroy($company): JsonResponse
     {
-        $company = Company::findOrFail($id);
+        $company = Company::findOrFail($company);
         $company->delete();
         return $this->success(null, 'Company deleted successfully.');
     }

@@ -37,9 +37,9 @@ class BranchController extends Controller
     /**
      * Display the specified branch.
      */
-    public function show($id): JsonResponse
+    public function show($branch): JsonResponse
     {
-        $branch = Branch::findOrFail($id);
+        $branch = Branch::findOrFail($branch);
         $branch->load('company', 'employees', 'hrManagers');
         return $this->success(['branch' => $branch], 'Branch retrieved successfully.');
     }
@@ -47,9 +47,9 @@ class BranchController extends Controller
     /**
      * Update the specified branch.
      */
-    public function update(BranchRequest $request, $id): JsonResponse
+    public function update(BranchRequest $request, $branch): JsonResponse
     {
-        $branch = Branch::findOrFail($id);
+        $branch = Branch::findOrFail($branch);
         $branch->update([
             'company_id' => $request->company_id,
             'name' => $request->name,
@@ -64,9 +64,9 @@ class BranchController extends Controller
     /**
      * Remove the specified branch.
      */
-    public function destroy($id): JsonResponse
+    public function destroy($branch): JsonResponse
     {
-        $branch = Branch::findOrFail($id);
+        $branch = Branch::findOrFail($branch);
         $branch->delete();
         return $this->success(null, 'Branch deleted successfully.');
     }

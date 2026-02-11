@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Employee extends Model
 {
-
     protected $fillable = [
         'user_id',
         'created_by',
@@ -83,5 +82,13 @@ class Employee extends Model
     public function status()
     {
         return $this->belongsTo(EmployeeStatus::class, 'employee_status_id');
+    }
+
+    /**
+     * Get the documents for this employee.
+     */
+    public function documents()
+    {
+        return $this->hasMany(EmployeeDocument::class);
     }
 }
