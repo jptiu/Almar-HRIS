@@ -36,8 +36,8 @@ class AuthController extends Controller
             // Regenerate session to prevent session fixation
             $request->session()->regenerate();
 
-            // Load roles for the user
-            $user->load('roles');
+            // Load roles and employee data with relationships for the user
+            $user->load(['roles', 'employee.position', 'employee.department', 'employee.branch', 'employee.company']);
 
             return $this->success([
                 'user' => $user,
@@ -69,7 +69,7 @@ class AuthController extends Controller
      */
     public function me(Request $request)
     {
-        $user = $request->user()->load('roles');
+        $user = $request->user()->load(['roles', 'employee.position', 'employee.department', 'employee.branch', 'employee.company']);
         return $this->success(['user' => $user], 'User retrieved successfully');
     }
 }
