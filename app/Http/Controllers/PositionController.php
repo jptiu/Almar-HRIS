@@ -37,9 +37,9 @@ class PositionController extends Controller
     /**
      * Display the specified position.
      */
-    public function show($id): JsonResponse
+    public function show($position): JsonResponse
     {
-        $position = Position::findOrFail($id);
+        $position = Position::findOrFail($position);
         $position->load('department', 'positionLevel');
         return $this->success(['position' => $position], 'Position retrieved successfully.');
     }
@@ -47,9 +47,9 @@ class PositionController extends Controller
     /**
      * Update the specified position.
      */
-    public function update(PositionRequest $request, $id): JsonResponse
+    public function update(PositionRequest $request, $position): JsonResponse
     {
-        $position = Position::findOrFail($id);
+        $position = Position::findOrFail($position);
         $position->update([
             'department_id' => $request->department_id,
             'title' => $request->title,
@@ -64,9 +64,9 @@ class PositionController extends Controller
     /**
      * Remove the specified position.
      */
-    public function destroy($id): JsonResponse
+    public function destroy($position): JsonResponse
     {
-        $position = Position::findOrFail($id);
+        $position = Position::findOrFail($position);
         $position->delete();
         return $this->success(null, 'Position deleted successfully.');
     }
