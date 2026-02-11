@@ -18,9 +18,10 @@ class PositionController extends Controller
             'department_id' => $request->department_id,
             'title' => $request->title,
             'position_level_id' => $request->position_level_id,
+            'created_by' => $request->user()?->id,
         ]);
 
-        $position->load('department', 'positionLevel');
+        $position->load('department', 'positionLevel', 'creator');
 
         return $this->created(['position' => $position], 'Position created successfully.');
     }
@@ -30,7 +31,7 @@ class PositionController extends Controller
      */
     public function index(): JsonResponse
     {
-        $positions = Position::with('department', 'positionLevel')->get();
+        $positions = Position::with('department', 'positionLevel', 'creator')->get();
         return $this->success(['positions' => $positions], 'Positions retrieved successfully.');
     }
 
@@ -40,7 +41,7 @@ class PositionController extends Controller
     public function show($position): JsonResponse
     {
         $position = Position::findOrFail($position);
-        $position->load('department', 'positionLevel');
+        $position->load('department', 'positionLevel', 'creator');
         return $this->success(['position' => $position], 'Position retrieved successfully.');
     }
 
@@ -56,7 +57,7 @@ class PositionController extends Controller
             'position_level_id' => $request->position_level_id,
         ]);
 
-        $position->load('department', 'positionLevel');
+        $position->load('department', 'positionLevel', 'creator');
 
         return $this->success(['position' => $position], 'Position updated successfully.');
     }

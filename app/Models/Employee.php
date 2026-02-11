@@ -12,6 +12,7 @@ class Employee extends Model
         'company_id',
         'branch_id',
         'position_id',
+        'department_id',
         'manager_id',
         'employee_status_id',
         'first_name',
@@ -90,5 +91,13 @@ class Employee extends Model
     public function documents()
     {
         return $this->hasMany(EmployeeDocument::class);
+    }
+
+    /**
+     * Get the department directly.
+     */
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
     }
 }

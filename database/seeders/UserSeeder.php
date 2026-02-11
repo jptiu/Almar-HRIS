@@ -57,6 +57,79 @@ class UserSeeder extends Seeder
         if ($employeeRole && !$employee->roles()->exists()) {
             $employee->roles()->attach($employeeRole);
         }
+
+        // Create additional employee users for seeding
+        $hrManager = User::firstOrCreate(
+            ['email' => 'hrmanager@almar.com'],
+            [
+                'email' => 'hrmanager@almar.com',
+                'password' => bcrypt('password'),
+                'is_active' => true,
+            ]
+        );
+        if ($employeeRole && !$hrManager->roles()->exists()) {
+            $hrManager->roles()->attach($employeeRole);
+        }
+
+        $itManager = User::firstOrCreate(
+            ['email' => 'itmanager@almar.com'],
+            [
+                'email' => 'itmanager@almar.com',
+                'password' => bcrypt('password'),
+                'is_active' => true,
+            ]
+        );
+        if ($employeeRole && !$itManager->roles()->exists()) {
+            $itManager->roles()->attach($employeeRole);
+        }
+
+        $financeManager = User::firstOrCreate(
+            ['email' => 'financemanager@almar.com'],
+            [
+                'email' => 'financemanager@almar.com',
+                'password' => bcrypt('password'),
+                'is_active' => true,
+            ]
+        );
+        if ($employeeRole && !$financeManager->roles()->exists()) {
+            $financeManager->roles()->attach($employeeRole);
+        }
+
+        $hrOfficer = User::firstOrCreate(
+            ['email' => 'hrofficer@almar.com'],
+            [
+                'email' => 'hrofficer@almar.com',
+                'password' => bcrypt('password'),
+                'is_active' => true,
+            ]
+        );
+        if ($employeeRole && !$hrOfficer->roles()->exists()) {
+            $hrOfficer->roles()->attach($employeeRole);
+        }
+
+        $developer = User::firstOrCreate(
+            ['email' => 'developer@almar.com'],
+            [
+                'email' => 'developer@almar.com',
+                'password' => bcrypt('password'),
+                'is_active' => true,
+            ]
+        );
+        if ($employeeRole && !$developer->roles()->exists()) {
+            $developer->roles()->attach($employeeRole);
+        }
+
+        $accountant = User::firstOrCreate(
+            ['email' => 'accountant@almar.com'],
+            [
+                'email' => 'accountant@almar.com',
+                'password' => bcrypt('password'),
+                'is_active' => true,
+            ]
+        );
+        if ($employeeRole && !$accountant->roles()->exists()) {
+            $accountant->roles()->attach($employeeRole);
+        }
     }
 }
 
