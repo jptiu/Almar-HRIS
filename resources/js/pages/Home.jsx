@@ -12,10 +12,7 @@ export default function Home() {
                 />
             </div>
 
-            <div
-                className="relative z-10 flex items-center justify-center px-7 md:px-15 lg:px-23"
-                style={{ minHeight: "calc(100vh - 100px)" }}
-            >
+            <div className="min-h-screen w-full flex items-center justify-center px-4">
                 <LoginForm />
             </div>
 

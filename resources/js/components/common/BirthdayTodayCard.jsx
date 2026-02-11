@@ -7,20 +7,28 @@ export function BirthdayTodayCard({ data }) {
     const [month, day] = data.date.split(" ");
 
     return (
-        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 w-full">
-            <div className="relative w-27 h-27 shrink-0">
-                <img
-                    src="/images/birthday-badge.svg"
-                    alt=""
-                    className="w-full h-full"
-                />
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-                    <span className="text-4xl font-extralight">{day}</span>
-                    <span className="text-xl font-bold">{month}</span>
+        <div className="relative w-full mt-16">
+            {/* 🔹 Centered Floating Starburst Badge */}
+            <div className="absolute left-1/2 -translate-x-1/2 -top-14 z-20">
+                <div className="relative w-30 h-30">
+                    <img
+                        src="/images/birthday-badge.svg"
+                        alt=""
+                        className="w-full h-full"
+                    />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
+                        <span className="text-4xl font-extralight leading-none">
+                            {day}
+                        </span>
+                        <span className="text-xl font-bold tracking-wide">
+                            {month}
+                        </span>
+                    </div>
                 </div>
             </div>
 
-            <Card className="flex-1 w-full sm:flex-1 p-4 bg-[#fcf5ea] border-[#F6DCB6] shadow-lg rounded-lg space-y-4 text-sm">
+            {/* 🔹 Card with Extended Top Surface */}
+            <Card className="pt-24 pb-6 px-6 bg-[#fcf5ea] border-[#F6DCB6] shadow-xl rounded-lg space-y-4 text-sm w-full">
                 {data.employees.map((emp) => {
                     const initials = getInitials(emp.firstName, emp.lastName);
                     const color = getColorFromName(
@@ -49,6 +57,7 @@ export function BirthdayTodayCard({ data }) {
                                     </p>
                                 </div>
                             </div>
+
                             <span className="text-2xl">🎉</span>
                         </div>
                     );

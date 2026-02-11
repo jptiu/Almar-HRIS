@@ -8,18 +8,18 @@ export default function LoginForm() {
     const [showPassword, setShowPassword] = useState(false);
 
     return (
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-sm">
             <div className="rounded-3xl border border-glass-border-hover backdrop-blur-xs shadow-2xl px-8 py-10">
                 <div className="flex justify-center mb-10">
                     <img
                         src="/images/almar-hris-logo.svg"
                         alt="Almar HRIS Logo"
-                        className="w-70 h-auto object-contain"
+                        className="w-60 h-auto object-contain"
                     />
                 </div>
 
                 <div className="mb-8 text-start">
-                    <h2 className="text-text-primary text-2xl md:text-4xl font-bold pb-5">
+                    <h2 className="text-text-primary text-2xl md:text-3xl font-bold pb-5">
                         Welcome.
                     </h2>
                     <h2 className="text-text-secondary text-sm md:text-sm font-light">
@@ -35,6 +35,7 @@ export default function LoginForm() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         rightIcon={Mail}
+                        size="xs"
                     />
 
                     <InputField
@@ -47,6 +48,7 @@ export default function LoginForm() {
                         showPassword={showPassword}
                         togglePassword={() => setShowPassword((prev) => !prev)}
                         rightIcon={showPassword ? EyeOff : Eye}
+                        size="xs"
                     />
 
                     <div className="flex gap-4 pt-6">

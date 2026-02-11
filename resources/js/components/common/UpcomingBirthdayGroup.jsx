@@ -6,15 +6,21 @@ export function UpcomingBirthdayGroup({ group }) {
     const [month, day] = group.date.split(" ");
 
     return (
-        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 w-full">
-            {/* Date */}
-            <div className="bg-[#0992C2] text-white rounded-lg w-20 h-20 flex flex-col items-center justify-center shadow shrink-0">
-                <span className="text-4xl font-extralight">{day}</span>
-                <span className="text-xl font-bold">{month}</span>
+        <div className="relative w-full mt-16">
+            {/* 🔹 Centered Floating Badge */}
+            <div className="absolute left-1/2 -translate-x-1/2 -top-10 z-20">
+                <div className="bg-[#0992C2] text-white rounded-xl w-24 h-24 flex flex-col items-center justify-center shadow-2xl">
+                    <span className="text-4xl font-extralight leading-none">
+                        {day}
+                    </span>
+                    <span className="text-xl font-bold tracking-wide">
+                        {month}
+                    </span>
+                </div>
             </div>
 
-            {/* List of employees */}
-            <Card className="flex-1 p-4 rounded-lg shadow-lg space-y-4 text-sm w-full mb-4">
+            {/* 🔹 Card (Extended Top Area) */}
+            <Card className="pt-20 pb-6 px-6 rounded-lg shadow-xl space-y-4 text-sm w-full">
                 {group.employees.map((emp) => {
                     const name = `${emp.firstName} ${emp.lastName}`;
                     const initials = getInitials(emp.firstName, emp.lastName);
@@ -23,7 +29,7 @@ export function UpcomingBirthdayGroup({ group }) {
                     return (
                         <div
                             key={emp.id}
-                            className="flex items-center justify-between flex-wrap"
+                            className="flex items-center justify-between"
                         >
                             <div className="flex items-center gap-3">
                                 <div
@@ -41,7 +47,7 @@ export function UpcomingBirthdayGroup({ group }) {
                                 </div>
                             </div>
 
-                            <span className="bg-gray-100 px-3 py-1 rounded-full text-sm font-semibold whitespace-nowrap shrink-0 mt-2 sm:mt-0">
+                            <span className="bg-gray-100 px-3 py-1 rounded-full text-sm font-semibold whitespace-nowrap shrink-0">
                                 {emp.daysLeft ?? "-"} d
                             </span>
                         </div>
