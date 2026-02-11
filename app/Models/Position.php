@@ -11,6 +11,7 @@ class Position extends Model
         'department_id',
         'title',
         'position_level_id',
+        'created_by',
     ];
 
     public function department()
@@ -21,5 +22,13 @@ class Position extends Model
     public function positionLevel()
     {
         return $this->belongsTo(PositionLevel::class);
+    }
+
+    /**
+     * Get the user who created this position.
+     */
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }
