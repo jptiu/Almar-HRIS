@@ -1,12 +1,11 @@
 // resources/js/pages/employee/Dashboard.jsx
 import { useState, useEffect } from "react";
-import { useAuth } from "../../hooks/useAuth";
-import { useGreeting } from "../../hooks/useGreeting";
-import Card from "../../ui/Card";
-import { Button } from "../../ui/Button";
-import Badge from "../../ui/Badge";
+import { useAuth } from "../../../hooks/useAuth";
+import { useGreeting } from "../../../hooks/useGreeting";
+import { Card } from "@/components/ui";
+import { Badge, Button } from "@/components/ui";
 import { CalendarDays, Receipt, Clock, TrendingUp } from "lucide-react";
-import api from "../../utils/api";
+import api from "../../../utils/api";
 
 const EmployeeDashboard = () => {
     const { user } = useAuth();
@@ -31,8 +30,8 @@ const EmployeeDashboard = () => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-[400px]">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-brand-primary)]"></div>
+            <div className="flex items-center justify-center min-h-100">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"></div>
             </div>
         );
     }
@@ -44,7 +43,7 @@ const EmployeeDashboard = () => {
                 <h1 className="text-3xl font-bold text-text-primary mb-2">
                     {greeting}, {user?.name}!
                 </h1>
-                <p className="text-[var(--color-text-secondary)]">
+                <p className="text-(--color-text-secondary)">
                     Here's what's happening with your account today.
                 </p>
             </div>
@@ -54,18 +53,18 @@ const EmployeeDashboard = () => {
                 <Card hover>
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-[var(--color-text-tertiary)] text-sm">
+                            <p className="text-(--color-text-tertiary) text-sm">
                                 Leave Balance
                             </p>
                             <p className="text-3xl font-bold text-text-primary mt-2">
                                 {stats?.leaveBalance || 12}
                             </p>
-                            <p className="text-[var(--color-text-muted)] text-xs mt-1">
+                            <p className="text-(--color-text-muted) text-xs mt-1">
                                 days remaining
                             </p>
                         </div>
-                        <div className="w-12 h-12 rounded-lg bg-[var(--color-brand-primary-200)] flex items-center justify-center">
-                            <CalendarDays className="w-6 h-6 text-[var(--color-brand-primary)]" />
+                        <div className="w-12 h-12 rounded-lg bg-(--color-brand-primary-200) flex items-center justify-center">
+                            <CalendarDays className="w-6 h-6 text-(--color-brand-primary)" />
                         </div>
                     </div>
                 </Card>
@@ -73,18 +72,18 @@ const EmployeeDashboard = () => {
                 <Card hover>
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-[var(--color-text-tertiary)] text-sm">
+                            <p className="text-(--color-text-tertiary) text-sm">
                                 Pending Requests
                             </p>
                             <p className="text-3xl font-bold text-text-primary mt-2">
                                 {stats?.pendingRequests || 2}
                             </p>
-                            <p className="text-[var(--color-text-muted)] text-xs mt-1">
+                            <p className="text-(--color-text-muted) text-xs mt-1">
                                 awaiting approval
                             </p>
                         </div>
-                        <div className="w-12 h-12 rounded-lg bg-[var(--color-warning)] bg-opacity-20 flex items-center justify-center">
-                            <Clock className="w-6 h-6 text-[var(--color-warning)]" />
+                        <div className="w-12 h-12 rounded-lg bg-(--color-warning)/20 flex items-center justify-center">
+                            <Clock className="w-6 h-6 text-(--color-warning)" />
                         </div>
                     </div>
                 </Card>
@@ -92,18 +91,18 @@ const EmployeeDashboard = () => {
                 <Card hover>
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-[var(--color-text-tertiary)] text-sm">
+                            <p className="text-(--color-text-tertiary) text-sm">
                                 This Month
                             </p>
                             <p className="text-3xl font-bold text-text-primary mt-2">
                                 ${stats?.salary || "5,000"}
                             </p>
-                            <p className="text-[var(--color-text-muted)] text-xs mt-1">
+                            <p className="text-(--color-text-muted) text-xs mt-1">
                                 gross salary
                             </p>
                         </div>
-                        <div className="w-12 h-12 rounded-lg bg-[var(--color-success)] bg-opacity-20 flex items-center justify-center">
-                            <Receipt className="w-6 h-6 text-[var(--color-success)]" />
+                        <div className="w-12 h-12 rounded-lg bg-(--color-success)/20 flex items-center justify-center">
+                            <Receipt className="w-6 h-6 text-(--color-success)" />
                         </div>
                     </div>
                 </Card>
@@ -111,18 +110,18 @@ const EmployeeDashboard = () => {
                 <Card hover>
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-[var(--color-text-tertiary)] text-sm">
+                            <p className="text-(--color-text-tertiary) text-sm">
                                 Performance
                             </p>
                             <p className="text-3xl font-bold text-text-primary mt-2">
                                 {stats?.performance || 92}%
                             </p>
-                            <p className="text-[var(--color-text-muted)] text-xs mt-1">
+                            <p className="text-(--color-text-muted) text-xs mt-1">
                                 this quarter
                             </p>
                         </div>
-                        <div className="w-12 h-12 rounded-lg bg-[var(--color-info)] bg-opacity-20 flex items-center justify-center">
-                            <TrendingUp className="w-6 h-6 text-[var(--color-info)]" />
+                        <div className="w-12 h-12 rounded-lg bg-(--color-info)/20 flex items-center justify-center">
+                            <TrendingUp className="w-6 h-6 text-(--color-info)" />
                         </div>
                     </div>
                 </Card>
@@ -164,7 +163,7 @@ const EmployeeDashboard = () => {
                                 <p className="text-text-primary font-medium">
                                     {activity.title}
                                 </p>
-                                <p className="text-[var(--color-text-tertiary)] text-sm">
+                                <p className="text-(--color-text-tertiary) text-sm">
                                     {activity.date}
                                 </p>
                             </div>

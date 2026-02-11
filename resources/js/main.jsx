@@ -3,8 +3,8 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 // Layouts
-import DashboardLayout from "./layouts/DashboardLayout";
-import RoleBasedRoute from "./layouts/RoleBasedRoute";
+import DashboardLayout from "./components/layouts/DashboardLayout";
+import RoleBasedRoute from "./components/layouts/RoleBasedRoute";
 
 // Pages
 import Home from "./pages/Home";
@@ -15,14 +15,14 @@ import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/Dashboard";
 
 // HR Pages
-import HRDashboard from "./pages/hr/Dashboard";
+import { HRDashboard } from "./pages/shared/components/dashboard";
 
 // Employee Pages
-import EmployeeDashboard from "./pages/employee/Dashboard";
+import EmployeeDashboard from "./pages/employee/components/Dashboard";
 import EmployeeProfile from "./pages/employee/Profile";
 
 // Auth Store
-import useAuthStore from "./stores/authStore";
+import { useAuthStore } from "./stores";
 
 function App() {
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);

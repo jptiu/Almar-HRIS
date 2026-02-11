@@ -1,8 +1,6 @@
 // resources/js/components/NotificationPanel.jsx
 import { X, Check, Trash2, Bell } from "lucide-react";
-import useNotificationStore from "../stores/notificationStore";
-import useUIStore from "../stores/uiStore";
-import Badge from "../ui/Badge";
+import { useUIStore, useNotificationStore } from "@/stores";
 
 const NotificationPanel = () => {
     const notifications = useNotificationStore((state) => state.notifications);
@@ -20,14 +18,14 @@ const NotificationPanel = () => {
         switch (type) {
             case "success":
                 return (
-                    <Check className="w-5 h-5 text-[var(--color-success)]" />
+                    <Check className="w-5 h-5 text-success" />
                 );
             case "warning":
-                return <Bell className="w-5 h-5 text-[var(--color-warning)]" />;
+                return <Bell className="w-5 h-5 text-warning" />;
             case "error":
-                return <Bell className="w-5 h-5 text-[var(--color-danger)]" />;
+                return <Bell className="w-5 h-5 text-danger" />;
             default:
-                return <Bell className="w-5 h-5 text-[var(--color-info)]" />;
+                return <Bell className="w-5 h-5 text-info" />;
         }
     };
 
@@ -43,9 +41,9 @@ const NotificationPanel = () => {
     };
 
     return (
-        <div className="fixed right-4 top-20 w-96 max-h-[600px] glass-container rounded-lg shadow-[0_12px_40px_var(--color-shadow-elevation)] z-50 flex flex-col">
+        <div className="fixed right-4 top-20 w-96 max-h-150 glass-container rounded-lg shadow-[0_12px_40px_var(--color-shadow-elevation)] z-50 flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-[var(--color-border-default)]">
+            <div className="flex items-center justify-between p-4 border-b border-(--color-border-default)">
                 <h3 className="text-lg font-semibold text-text-primary">
                     Notifications
                 </h3>
@@ -53,7 +51,7 @@ const NotificationPanel = () => {
                     {notifications.length > 0 && (
                         <button
                             onClick={markAllAsRead}
-                            className="text-xs text-[var(--color-text-tertiary)] hover:text-text-primary transition-colors"
+                            className="text-xs text-text-tertiary hover:text-text-primary transition-colors"
                         >
                             Mark all read
                         </button>
@@ -71,27 +69,27 @@ const NotificationPanel = () => {
             <div className="flex-1 overflow-y-auto">
                 {notifications.length === 0 ? (
                     <div className="flex flex-col items-center justify-center p-8 text-center">
-                        <Bell className="w-12 h-12 text-[var(--color-text-muted)] mb-3" />
-                        <p className="text-[var(--color-text-secondary)]">
+                        <Bell className="w-12 h-12 text-text-muted mb-3" />
+                        <p className="text-text-secondary">
                             No notifications
                         </p>
-                        <p className="text-[var(--color-text-muted)] text-sm mt-1">
+                        <p className="text-text-muted text-sm mt-1">
                             You're all caught up!
                         </p>
                     </div>
                 ) : (
-                    <div className="divide-y divide-[var(--color-border-default)]">
+                    <div className="divide-y divide-(--color-border-default)">
                         {notifications.map((notification) => (
                             <div
                                 key={notification.id}
                                 className={`p-4 hover:bg-(--color-brand-primary-100) transition-colors ${
                                     !notification.read
-                                        ? "bg-[var(--color-brand-primary-50)]"
+                                        ? "bg-(--color-brand-primary-50)"
                                         : ""
                                 }`}
                             >
                                 <div className="flex gap-3">
-                                    <div className="flex-shrink-0 mt-1">
+                                    <div className="shrink-0 mt-1">
                                         {getNotificationIcon(notification.type)}
                                     </div>
                                     <div className="flex-1 min-w-0">
@@ -105,16 +103,16 @@ const NotificationPanel = () => {
                                                         notification.id
                                                     )
                                                 }
-                                                className="flex-shrink-0 p-1 hover:bg-[var(--color-brand-primary-200)] rounded transition-colors"
+                                                className="shrink-0 p-1 hover:bg-(--color-brand-primary-200) rounded-sm transition-colors"
                                             >
-                                                <Trash2 className="w-3 h-3 text-[var(--color-text-tertiary)]" />
+                                                <Trash2 className="w-3 h-3 text-text-tertiary" />
                                             </button>
                                         </div>
-                                        <p className="text-[var(--color-text-tertiary)] text-xs mt-1">
+                                        <p className="text-text-tertiary text-xs mt-1">
                                             {notification.message}
                                         </p>
                                         <div className="flex items-center gap-2 mt-2">
-                                            <span className="text-[var(--color-text-muted)] text-xs">
+                                            <span className="text-text-muted text-xs">
                                                 {formatTime(
                                                     notification.timestamp
                                                 )}
@@ -126,7 +124,7 @@ const NotificationPanel = () => {
                                                             notification.id
                                                         )
                                                     }
-                                                    className="text-xs text-[var(--color-info)] hover:underline"
+                                                    className="text-xs text-info hover:underline"
                                                 >
                                                     Mark as read
                                                 </button>
@@ -142,10 +140,10 @@ const NotificationPanel = () => {
 
             {/* Footer */}
             {notifications.length > 0 && (
-                <div className="p-3 border-t border-[var(--color-border-default)]">
+                <div className="p-3 border-t border-(--color-border-default)">
                     <button
                         onClick={clearAll}
-                        className="w-full text-center text-sm text-[var(--color-danger)] hover:text-[var(--color-danger-hover)] transition-colors"
+                        className="w-full text-center text-sm text-danger hover:text-danger-hover transition-colors"
                     >
                         Clear all notifications
                     </button>

@@ -9,7 +9,7 @@ const getGreeting = () => {
   return "Good evening";
 };
 
-const useUIStore = create(
+export const useUIStore = create(
   persist(
     (set) => ({
       sidebarCollapsed: false,
@@ -48,5 +48,3 @@ const useUIStore = create(
     }
   )
 );
-
-export default useUIStore;

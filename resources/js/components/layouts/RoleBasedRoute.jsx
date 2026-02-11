@@ -1,7 +1,7 @@
 // resources/js/layouts/RoleBasedRoute.jsx
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
-import { LoadingOverlay } from "../components/LoadingSpinner";
+import { useAuth } from "../../hooks/useAuth";
+import { LoadingOverlay } from "../LoadingSpinner";
 
 const RoleBasedRoute = ({ children, allowedRoles = [] }) => {
     const { isAuthenticated, role, isLoading } = useAuth();

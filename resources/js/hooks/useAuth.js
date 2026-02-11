@@ -1,7 +1,7 @@
 // resources/js/hooks/useAuth.js
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useAuthStore from '../stores/authStore';
+import { useAuthStore } from '@/stores';
 
 /**
  * Custom hook for authentication

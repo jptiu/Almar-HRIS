@@ -1,10 +1,10 @@
 // resources/js/pages/TestLogin.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useAuthStore from "../stores/authStore";
+import { useAuthStore } from "@/stores";
 // import { rolePermissions } from "../config/rolePermissions";
-import { Button } from "../ui/Button";
-import Card from "../ui/Card";
+import { Button } from "../components/ui/Button";
+import { Card } from "@/components/ui";
 
 const TestLogin = () => {
     const navigate = useNavigate();
@@ -48,10 +48,10 @@ const TestLogin = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[var(--color-brand-primary-dark)] via-[var(--color-brand-primary-dark)] to-[var(--color-brand-primary)] flex items-center justify-center p-6">
+        <div className="min-h-screen bg-linear-to-br from-brand-primary-dark via-(--color-brand-primary-dark) to-brand-primary flex items-center justify-center p-6">
             <Card className="max-w-md w-full">
                 <div className="text-center mb-6">
-                    <div className="w-20 h-20 bg-[var(--color-brand-primary)] rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <div className="w-20 h-20 bg-(--color-brand-primary) rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
                         <span className="text-text-primary font-bold text-4xl">
                             A
                         </span>
@@ -59,7 +59,7 @@ const TestLogin = () => {
                     <h1 className="text-3xl font-bold text-text-primary mb-2">
                         ALMAR HRIS
                     </h1>
-                    <p className="text-[var(--color-text-secondary)]">
+                    <p className="text-(--color-text-secondary)">
                         Select a role to test the dashboard
                     </p>
                 </div>
@@ -71,18 +71,18 @@ const TestLogin = () => {
                             onClick={() => setSelectedRole(role)}
                             className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
                                 selectedRole === role
-                                    ? "border-[var(--color-brand-primary)] bg-[var(--color-brand-primary-100)]"
-                                    : "border-[var(--color-border-default)] hover:border-[var(--color-border-hover)]"
+                                    ? "border-(--color-brand-primary) bg-(--color-brand-primary-100)"
+                                    : "border-(--color-border-default) hover:border-(--color-border-hover)"
                             }`}
                         >
                             <div className="flex items-center gap-3">
                                 <div
                                     className={`w-12 h-12 rounded-lg flex items-center justify-center ${
                                         role === "admin"
-                                            ? "bg-[var(--color-danger)] bg-opacity-20"
+                                            ? "bg-(--color-danger)/20"
                                             : role === "hr"
-                                            ? "bg-[var(--color-info)] bg-opacity-20"
-                                            : "bg-[var(--color-success)] bg-opacity-20"
+                                              ? "bg-(--color-info)/20"
+                                              : "bg-(--color-success)/20"
                                     }`}
                                 >
                                     <span className="text-2xl font-bold text-text-primary capitalize">
@@ -93,15 +93,15 @@ const TestLogin = () => {
                                     <p className="font-semibold text-text-primary capitalize">
                                         {role}
                                     </p>
-                                    <p className="text-sm text-[var(--color-text-tertiary)]">
+                                    <p className="text-sm text-(--color-text-tertiary)">
                                         {user.name}
                                     </p>
-                                    <p className="text-xs text-[var(--color-text-muted)]">
+                                    <p className="text-xs text-(--color-text-muted)">
                                         {user.position}
                                     </p>
                                 </div>
                                 {selectedRole === role && (
-                                    <div className="w-6 h-6 rounded-full bg-[var(--color-brand-primary)] flex items-center justify-center">
+                                    <div className="w-6 h-6 rounded-full bg-(--color-brand-primary) flex items-center justify-center">
                                         <svg
                                             className="w-4 h-4 text-white"
                                             fill="currentColor"
@@ -120,15 +120,12 @@ const TestLogin = () => {
                     ))}
                 </div>
 
-                <Button
-                    className="w-full mt-6"
-                    onClick={handleLogin}
-                >
+                <Button className="w-full mt-6" onClick={handleLogin}>
                     Login as {selectedRole}
                 </Button>
 
-                <div className="mt-6 p-4 rounded-lg bg-[var(--color-info)] bg-opacity-10 border border-[var(--color-info)] border-opacity-30">
-                    <p className="text-xs text-[var(--color-text-secondary)] text-center">
+                <div className="mt-6 p-4 rounded-lg bg-(--color-info)/10 border border-(--color-info)/30">
+                    <p className="text-xs text-(--color-text-secondary) text-center">
                         ⚠️ This is a test login page for development. Replace
                         with real authentication in production.
                     </p>

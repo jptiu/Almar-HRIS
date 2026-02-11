@@ -1,6 +1,6 @@
 // resources/js/hooks/useGreeting.js
 import { useEffect } from 'react';
-import useUIStore from '../stores/uiStore';
+import { useUIStore } from '@/stores';
 
 export const useGreeting = () => {
   const greeting = useUIStore((state) => state.greeting);

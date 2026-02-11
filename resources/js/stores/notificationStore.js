@@ -1,7 +1,7 @@
 // resources/js/stores/notificationStore.js
 import { create } from 'zustand';
 
-const useNotificationStore = create((set) => ({
+export const useNotificationStore = create((set) => ({
   notifications: [],
   unreadCount: 0,
 
@@ -47,5 +47,3 @@ const useNotificationStore = create((set) => ({
       unreadCount: 0,
     }),
 }));
-
-export default useNotificationStore;

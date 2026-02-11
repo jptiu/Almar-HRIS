@@ -12,9 +12,9 @@ const LoadingSpinner = ({ size = "md", className = "" }) => {
         <div className="flex items-center justify-center">
             <div
                 className={cn(
-                    "animate-spin rounded-full border-t-[var(--color-brand-primary)] border-r-transparent border-b-[var(--color-brand-primary)] border-l-transparent",
+                    "animate-spin rounded-full border-t-brand-primary border-r-transparent border-b-brand-primary border-l-transparent",
                     sizes[size],
-                    className
+                    className,
                 )}
             />
         </div>
@@ -23,7 +23,7 @@ const LoadingSpinner = ({ size = "md", className = "" }) => {
 
 export const LoadingOverlay = ({ message = "Loading..." }) => {
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--color-surface-overlay)] backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-(--color-surface-overlay) backdrop-blur-xs">
             <div className="glass-container rounded-lg p-8 flex flex-col items-center gap-4">
                 <LoadingSpinner size="lg" />
                 <p className="text-text-primary font-medium">{message}</p>

@@ -1,8 +1,8 @@
 // resources/js/ui/Modal.jsx
 import { useEffect } from "react";
 import { X } from "lucide-react";
-import { cn } from "../utils/cn";
-import { Button } from "../ui/Button";
+import { cn } from "../../utils/cn";
+import { Button } from "./Button";
 
 const Modal = ({
     isOpen,
@@ -48,7 +48,7 @@ const Modal = ({
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-[var(--color-surface-overlay)] backdrop-blur-sm"
+                className="absolute inset-0 bg-(--color-surface-overlay) backdrop-blur-xs"
                 onClick={onClose}
             />
 
@@ -56,12 +56,12 @@ const Modal = ({
             <div
                 className={cn(
                     "relative w-full glass-container rounded-lg shadow-[0_20px_60px_var(--color-shadow-elevation)] animate-in fade-in zoom-in duration-200",
-                    sizes[size]
+                    sizes[size],
                 )}
             >
                 {/* Header */}
                 {(title || showCloseButton) && (
-                    <div className="flex items-center justify-between p-6 border-b border-[var(--color-border-default)]">
+                    <div className="flex items-center justify-between p-6 border-b border-(--color-border-default)">
                         {title && (
                             <h2 className="text-2xl font-semibold text-text-primary">
                                 {title}
@@ -89,8 +89,8 @@ export const ModalFooter = ({ children, className = "" }) => {
     return (
         <div
             className={cn(
-                "flex items-center justify-end gap-3 pt-4 border-t border-[var(--color-border-default)]",
-                className
+                "flex items-center justify-end gap-3 pt-4 border-t border-(--color-border-default)",
+                className,
             )}
         >
             {children}

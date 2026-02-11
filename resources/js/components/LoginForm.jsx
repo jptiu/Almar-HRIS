@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Mail, Eye, EyeOff } from "lucide-react";
-import InputField from "../ui/InputField";
+import InputField from "./ui/InputField";
 
 export default function LoginForm() {
     const [email, setEmail] = useState("");
@@ -9,7 +9,7 @@ export default function LoginForm() {
 
     return (
         <div className="w-full max-w-md">
-            <div className="rounded-3xl border border-glass-border-hover backdrop-blur-sm shadow-2xl px-8 py-10">
+            <div className="rounded-3xl border border-glass-border-hover backdrop-blur-xs shadow-2xl px-8 py-10">
                 <div className="flex justify-center mb-10">
                     <img
                         src="/images/almar-hris-logo.svg"

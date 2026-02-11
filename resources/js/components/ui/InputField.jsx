@@ -12,7 +12,7 @@ export default function InputField({
     togglePassword,
 }) {
     return (
-        <div className="group relative bg-surface-card border border-(--color-border-default) rounded-2xl px-8 py-3 transition-all duration-300 ease-out hover:border-[var(--color-border-hover)] hover:bg-[var(--color-surface-input-hover)] focus-within:border-[var(--color-border-focus)] focus-within:shadow-[0_0_0_1px_var(--color-focus-ring),0_8px_30px_var(--color-shadow-focus)]">
+        <div className="group relative bg-surface-card border border-(--color-border-default) rounded-2xl px-8 py-3 transition-all duration-300 ease-out hover:border-(--color-border-hover) hover:bg-(--color-surface-input-hover) focus-within:border-(--color-border-focus) focus-within:shadow-[0_0_0_1px_var(--color-focus-ring),0_8px_30px_var(--color-shadow-focus)]">
             <label className="block text-xs text-text-tertiary tracking-wide mb-1">
                 {label}
             </label>

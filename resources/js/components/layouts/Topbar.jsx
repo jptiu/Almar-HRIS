@@ -1,11 +1,9 @@
 // resources/js/layouts/Topbar.jsx
 import { useState, useTransition } from "react";
 import { Menu, Bell, Search } from "lucide-react";
-import useUIStore from "../stores/uiStore";
-import useAuthStore from "../stores/authStore";
-import useNotificationStore from "../stores/notificationStore";
-import NotificationPanel from "../components/NotificationPanel";
-import { useMediaQuery } from "../hooks/useMediaQuery";
+import { useNotificationStore, useAuthStore, useUIStore } from "@/stores";
+import NotificationPanel from "../NotificationPanel";
+import { useMediaQuery } from "../../hooks/useMediaQuery";
 
 const Topbar = () => {
     const [isPending, startTransition] = useTransition();
@@ -14,10 +12,10 @@ const Topbar = () => {
     const toggleMobileMenu = useUIStore((state) => state.toggleMobileMenu);
     const sidebarCollapsed = useUIStore((state) => state.sidebarCollapsed);
     const notificationPanelOpen = useUIStore(
-        (state) => state.notificationPanelOpen
+        (state) => state.notificationPanelOpen,
     );
     const toggleNotificationPanel = useUIStore(
-        (state) => state.toggleNotificationPanel
+        (state) => state.toggleNotificationPanel,
     );
 
     const user = useAuthStore((state) => state.user);

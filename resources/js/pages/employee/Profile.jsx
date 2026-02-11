@@ -1,9 +1,9 @@
 // resources/js/pages/employee/Profile.jsx
 import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
-import Card from "../../ui/Card";
-import { Button } from "../../ui/Button";
-import Input from "../../ui/Input";
+import { Card } from "@/components/ui";
+import { Button } from "../../components/ui/Button";
+import { InputField } from "@/components/ui";
 import { User, Mail, Phone, MapPin, Briefcase, Calendar } from "lucide-react";
 
 const Profile = () => {
@@ -30,7 +30,7 @@ const Profile = () => {
                 <h1 className="text-3xl font-bold text-text-primary mb-2">
                     My Profile
                 </h1>
-                <p className="text-[var(--color-text-secondary)]">
+                <p className="text-(--color-text-secondary)">
                     Manage your personal information and account settings
                 </p>
             </div>
@@ -39,7 +39,7 @@ const Profile = () => {
                 {/* Profile Card */}
                 <Card className="lg:col-span-1">
                     <div className="flex flex-col items-center text-center">
-                        <div className="w-24 h-24 rounded-full bg-[var(--color-brand-primary)] flex items-center justify-center mb-4">
+                        <div className="w-24 h-24 rounded-full bg-(--color-brand-primary) flex items-center justify-center mb-4">
                             <span className="text-text-primary font-bold text-3xl">
                                 {user?.name?.charAt(0)?.toUpperCase()}
                             </span>
@@ -47,18 +47,18 @@ const Profile = () => {
                         <h2 className="text-xl font-semibold text-text-primary">
                             {user?.name}
                         </h2>
-                        <p className="text-[var(--color-text-tertiary)] text-sm mt-1">
+                        <p className="text-(--color-text-tertiary) text-sm mt-1">
                             {user?.position || "Employee"}
                         </p>
-                        <p className="text-[var(--color-text-muted)] text-xs mt-1 capitalize">
+                        <p className="text-(--color-text-muted) text-xs mt-1 capitalize">
                             {user?.role}
                         </p>
                         <div className="mt-6 w-full space-y-2">
-                            <div className="flex items-center gap-2 text-[var(--color-text-secondary)] text-sm">
+                            <div className="flex items-center gap-2 text-(--color-text-secondary) text-sm">
                                 <Mail className="w-4 h-4" />
                                 <span>{user?.email}</span>
                             </div>
-                            <div className="flex items-center gap-2 text-[var(--color-text-secondary)] text-sm">
+                            <div className="flex items-center gap-2 text-(--color-text-secondary) text-sm">
                                 <Calendar className="w-4 h-4" />
                                 <span>Joined Jan 2024</span>
                             </div>
@@ -84,7 +84,7 @@ const Profile = () => {
 
                     {isEditing ? (
                         <form onSubmit={handleSubmit} className="space-y-4">
-                            <Input
+                            <InputField
                                 label="Full Name"
                                 leftIcon={<User className="w-4 h-4" />}
                                 value={formData.name}
@@ -95,7 +95,7 @@ const Profile = () => {
                                     })
                                 }
                             />
-                            <Input
+                            <InputField
                                 label="Email Address"
                                 type="email"
                                 leftIcon={<Mail className="w-4 h-4" />}
@@ -107,7 +107,7 @@ const Profile = () => {
                                     })
                                 }
                             />
-                            <Input
+                            <InputField
                                 label="Phone Number"
                                 leftIcon={<Phone className="w-4 h-4" />}
                                 value={formData.phone}
@@ -118,7 +118,7 @@ const Profile = () => {
                                     })
                                 }
                             />
-                            <Input
+                            <InputField
                                 label="Address"
                                 leftIcon={<MapPin className="w-4 h-4" />}
                                 value={formData.address}
@@ -129,7 +129,7 @@ const Profile = () => {
                                     })
                                 }
                             />
-                            <Input
+                            <InputField
                                 label="Position"
                                 leftIcon={<Briefcase className="w-4 h-4" />}
                                 value={formData.position}
@@ -157,7 +157,7 @@ const Profile = () => {
                     ) : (
                         <div className="space-y-4">
                             <div>
-                                <label className="text-[var(--color-text-tertiary)] text-sm">
+                                <label className="text-(--color-text-tertiary) text-sm">
                                     Full Name
                                 </label>
                                 <p className="text-text-primary mt-1">
@@ -165,7 +165,7 @@ const Profile = () => {
                                 </p>
                             </div>
                             <div>
-                                <label className="text-[var(--color-text-tertiary)] text-sm">
+                                <label className="text-(--color-text-tertiary) text-sm">
                                     Email Address
                                 </label>
                                 <p className="text-text-primary mt-1">
@@ -173,7 +173,7 @@ const Profile = () => {
                                 </p>
                             </div>
                             <div>
-                                <label className="text-[var(--color-text-tertiary)] text-sm">
+                                <label className="text-(--color-text-tertiary) text-sm">
                                     Phone Number
                                 </label>
                                 <p className="text-text-primary mt-1">
@@ -181,7 +181,7 @@ const Profile = () => {
                                 </p>
                             </div>
                             <div>
-                                <label className="text-[var(--color-text-tertiary)] text-sm">
+                                <label className="text-(--color-text-tertiary) text-sm">
                                     Address
                                 </label>
                                 <p className="text-text-primary mt-1">
@@ -189,7 +189,7 @@ const Profile = () => {
                                 </p>
                             </div>
                             <div>
-                                <label className="text-[var(--color-text-tertiary)] text-sm">
+                                <label className="text-(--color-text-tertiary) text-sm">
                                     Position
                                 </label>
                                 <p className="text-text-primary mt-1">

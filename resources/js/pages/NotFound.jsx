@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { FileQuestion, ArrowRight } from "lucide-react";
-import { Button } from "../ui/Button";
+import { Button } from "../components/ui/Button";
 
 const NotFound = () => {
     const navigate = useNavigate();
@@ -42,11 +42,11 @@ const NotFound = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[var(--color-brand-primary-dark)] via-[var(--color-brand-primary-dark)] to-[var(--color-brand-primary)] flex items-center justify-center p-6">
+        <div className="min-h-screen bg-linear-to-br from-brand-primary-dark via-brand-primary-dark to-brand-primary flex items-center justify-center p-6">
             <div className="glass-container rounded-lg p-8 max-w-md w-full text-center">
                 {/* Icon */}
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[var(--color-warning)]/20 mb-6">
-                    <FileQuestion className="w-10 h-10 text-[var(--color-warning)]" />
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-warning/20 mb-6">
+                    <FileQuestion className="w-10 h-10 text-warning" />
                 </div>
 
                 {/* Title */}
@@ -58,17 +58,17 @@ const NotFound = () => {
                 </h2>
 
                 {/* Message */}
-                <p className="text-[var(--color-text-secondary)] mb-6">
+                <p className="text-text-secondary mb-6">
                     Sorry, the page you're looking for doesn't exist or has been
                     moved.
                 </p>
 
                 {/* Countdown */}
-                <div className="bg-[var(--color-surface-card)] rounded-lg p-4 mb-6">
-                    <p className="text-[var(--color-text-tertiary)] text-sm mb-2">
+                <div className="bg-surface-card rounded-lg p-4 mb-6">
+                    <p className="text-text-tertiary text-sm mb-2">
                         Redirecting to {getRedirectPath()} in
                     </p>
-                    <p className="text-3xl font-bold text-[var(--color-brand-primary)]">
+                    <p className="text-3xl font-bold text-brand-primary">
                         {countdown}
                     </p>
                 </div>

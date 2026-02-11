@@ -1,11 +1,11 @@
 // resources/js/layouts/DashboardLayout.jsx
 import { useEffect } from "react";
-import useUIStore from "../stores/uiStore";
+import { useUIStore } from "@/stores";
 import Topbar from "./Topbar";
 import Sidebar from "./Sidebar";
-import { useMediaQuery } from "../hooks/useMediaQuery";
+import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { cn } from "../utils/cn";
+import { cn } from "../../utils/cn";
 
 const DashboardLayout = ({ children }) => {
     const sidebarCollapsed = useUIStore((state) => state.sidebarCollapsed);
@@ -40,7 +40,7 @@ const DashboardLayout = ({ children }) => {
                         "flex items-center justify-center shadow-xl",
                         "hover:scale-110 transition-all duration-300 cursor-pointer",
 
-                        !sidebarCollapsed ? "left-61" : "left-17"
+                        !sidebarCollapsed ? "left-61" : "left-17",
                     )}
                 >
                     {sidebarCollapsed ? (
@@ -65,8 +65,8 @@ const DashboardLayout = ({ children }) => {
                     !isMobile && !sidebarCollapsed
                         ? "ml-64"
                         : !isMobile
-                        ? "ml-20"
-                        : "ml-0"
+                          ? "ml-20"
+                          : "ml-0"
                 } min-h-screen`}
             >
                 <Topbar />

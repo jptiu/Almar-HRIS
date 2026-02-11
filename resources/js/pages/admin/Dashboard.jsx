@@ -2,9 +2,8 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { useGreeting } from "../../hooks/useGreeting";
-import Card from "../../ui/Card";
-import { Button } from "../../ui/Button";
-import Badge from "../../ui/Badge";
+import { Card } from "@/components/ui";
+import { Badge, Button } from "@/components/ui";
 import {
     Users,
     Activity,
@@ -39,7 +38,7 @@ const AdminDashboard = () => {
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-[400px]">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-brand-primary)]"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-(--color-brand-primary)"></div>
             </div>
         );
     }
@@ -51,7 +50,7 @@ const AdminDashboard = () => {
                 <h1 className="text-3xl font-bold text-text-primary mb-2">
                     {greeting}, {user?.name || "Admin"}!
                 </h1>
-                <p className="text-[var(--color-text-secondary)]">
+                <p className="text-(--color-text-secondary)">
                     System overview and administrative controls
                 </p>
             </div>
@@ -61,18 +60,18 @@ const AdminDashboard = () => {
                 <Card hover>
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-[var(--color-text-tertiary)] text-sm">
+                            <p className="text-(--color-text-tertiary) text-sm">
                                 Total Users
                             </p>
                             <p className="text-3xl font-bold text-text-primary mt-2">
                                 {stats?.totalUsers || 312}
                             </p>
-                            <p className="text-[var(--color-success)] text-xs mt-1">
+                            <p className="text-(--color-success) text-xs mt-1">
                                 +8% from last month
                             </p>
                         </div>
-                        <div className="w-12 h-12 rounded-lg bg-[var(--color-brand-primary-200)] flex items-center justify-center">
-                            <Users className="w-6 h-6 text-[var(--color-brand-primary)]" />
+                        <div className="w-12 h-12 rounded-lg bg-(--color-brand-primary-200) flex items-center justify-center">
+                            <Users className="w-6 h-6 text-(--color-brand-primary)" />
                         </div>
                     </div>
                 </Card>
@@ -80,18 +79,18 @@ const AdminDashboard = () => {
                 <Card hover>
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-[var(--color-text-tertiary)] text-sm">
+                            <p className="text-(--color-text-tertiary) text-sm">
                                 System Health
                             </p>
                             <p className="text-3xl font-bold text-text-primary mt-2">
                                 {stats?.systemHealth || 98}%
                             </p>
-                            <p className="text-[var(--color-success)] text-xs mt-1">
+                            <p className="text-(--color-success) text-xs mt-1">
                                 All systems operational
                             </p>
                         </div>
-                        <div className="w-12 h-12 rounded-lg bg-[var(--color-success)] bg-opacity-20 flex items-center justify-center">
-                            <Activity className="w-6 h-6 text-[var(--color-success)]" />
+                        <div className="w-12 h-12 rounded-lg bg-(--color-success)/20 flex items-center justify-center">
+                            <Activity className="w-6 h-6 text-(--color-success)" />
                         </div>
                     </div>
                 </Card>
@@ -99,18 +98,18 @@ const AdminDashboard = () => {
                 <Card hover>
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-[var(--color-text-tertiary)] text-sm">
+                            <p className="text-(--color-text-tertiary) text-sm">
                                 Security Alerts
                             </p>
                             <p className="text-3xl font-bold text-text-primary mt-2">
                                 {stats?.securityAlerts || 3}
                             </p>
-                            <p className="text-[var(--color-warning)] text-xs mt-1">
+                            <p className="text-(--color-warning) text-xs mt-1">
                                 requires attention
                             </p>
                         </div>
-                        <div className="w-12 h-12 rounded-lg bg-[var(--color-warning)] bg-opacity-20 flex items-center justify-center">
-                            <AlertTriangle className="w-6 h-6 text-[var(--color-warning)]" />
+                        <div className="w-12 h-12 rounded-lg bg-(--color-warning)/20 flex items-center justify-center">
+                            <AlertTriangle className="w-6 h-6 text-(--color-warning)" />
                         </div>
                     </div>
                 </Card>
@@ -118,18 +117,18 @@ const AdminDashboard = () => {
                 <Card hover>
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-[var(--color-text-tertiary)] text-sm">
+                            <p className="text-(--color-text-tertiary) text-sm">
                                 Active Sessions
                             </p>
                             <p className="text-3xl font-bold text-text-primary mt-2">
                                 {stats?.activeSessions || 142}
                             </p>
-                            <p className="text-[var(--color-text-muted)] text-xs mt-1">
+                            <p className="text-(--color-text-muted) text-xs mt-1">
                                 current users online
                             </p>
                         </div>
-                        <div className="w-12 h-12 rounded-lg bg-[var(--color-info)] bg-opacity-20 flex items-center justify-center">
-                            <Server className="w-6 h-6 text-[var(--color-info)]" />
+                        <div className="w-12 h-12 rounded-lg bg-(--color-info)/20 flex items-center justify-center">
+                            <Server className="w-6 h-6 text-(--color-info)" />
                         </div>
                     </div>
                 </Card>
@@ -176,7 +175,7 @@ const AdminDashboard = () => {
                         ).map((event, index) => (
                             <div
                                 key={index}
-                                className="flex items-center justify-between p-3 rounded-lg bg-[var(--color-surface-card)]"
+                                className="flex items-center justify-between p-3 rounded-lg bg-(--color-surface-card)"
                             >
                                 <div>
                                     <div className="flex items-center gap-2">
@@ -187,10 +186,10 @@ const AdminDashboard = () => {
                                             {event.severity}
                                         </Badge>
                                     </div>
-                                    <p className="text-[var(--color-text-tertiary)] text-sm">
+                                    <p className="text-(--color-text-tertiary) text-sm">
                                         {event.user}
                                     </p>
-                                    <p className="text-[var(--color-text-muted)] text-xs mt-1">
+                                    <p className="text-(--color-text-muted) text-xs mt-1">
                                         {event.action} • {event.time}
                                     </p>
                                 </div>
@@ -206,41 +205,41 @@ const AdminDashboard = () => {
                     <div className="space-y-4">
                         <div>
                             <div className="flex items-center justify-between mb-2">
-                                <span className="text-[var(--color-text-secondary)] text-sm">
+                                <span className="text-(--color-text-secondary) text-sm">
                                     Admin Users
                                 </span>
                                 <span className="text-text-primary font-medium">
                                     15
                                 </span>
                             </div>
-                            <div className="w-full bg-[var(--color-surface-card)] rounded-full h-2">
-                                <div className="bg-[var(--color-brand-primary)] h-2 rounded-full w-[15%]"></div>
+                            <div className="w-full bg-(--color-surface-card) rounded-full h-2">
+                                <div className="bg-(--color-brand-primary) h-2 rounded-full w-[15%]"></div>
                             </div>
                         </div>
                         <div>
                             <div className="flex items-center justify-between mb-2">
-                                <span className="text-[var(--color-text-secondary)] text-sm">
+                                <span className="text-(--color-text-secondary) text-sm">
                                     HR Staff
                                 </span>
                                 <span className="text-text-primary font-medium">
                                     42
                                 </span>
                             </div>
-                            <div className="w-full bg-[var(--color-surface-card)] rounded-full h-2">
-                                <div className="bg-[var(--color-info)] h-2 rounded-full w-[42%]"></div>
+                            <div className="w-full bg-(--color-surface-card) rounded-full h-2">
+                                <div className="bg-(--color-info) h-2 rounded-full w-[42%]"></div>
                             </div>
                         </div>
                         <div>
                             <div className="flex items-center justify-between mb-2">
-                                <span className="text-[var(--color-text-secondary)] text-sm">
+                                <span className="text-(--color-text-secondary) text-sm">
                                     Employees
                                 </span>
                                 <span className="text-text-primary font-medium">
                                     255
                                 </span>
                             </div>
-                            <div className="w-full bg-[var(--color-surface-card)] rounded-full h-2">
-                                <div className="bg-[var(--color-success)] h-2 rounded-full w-[82%]"></div>
+                            <div className="w-full bg-(--color-surface-card) rounded-full h-2">
+                                <div className="bg-(--color-success) h-2 rounded-full w-[82%]"></div>
                             </div>
                         </div>
                     </div>

@@ -28,7 +28,7 @@ const UserMenu = ({ user }) => {
                 onClick={() => setIsOpen(!isOpen)}
                 className="flex items-center gap-2 p-2 hover:bg-(--color-brand-primary-100) rounded-lg transition-colors"
             >
-                <div className="w-8 h-8 rounded-full bg-[var(--color-brand-primary)] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-brand-primary flex items-center justify-center">
                     <span className="text-text-primary font-medium text-sm">
                         {user?.name?.charAt(0)?.toUpperCase() || "U"}
                     </span>
@@ -38,22 +38,22 @@ const UserMenu = ({ user }) => {
                 </span>
                 <ChevronDown
                     className={cn(
-                        "w-4 h-4 text-[var(--color-text-tertiary)] transition-transform",
-                        isOpen && "rotate-180"
+                        "w-4 h-4 text-text-tertiary transition-transform",
+                        isOpen && "rotate-180",
                     )}
                 />
             </button>
 
             {isOpen && (
                 <div className="absolute right-0 mt-2 w-56 glass-container rounded-lg shadow-[0_12px_40px_var(--color-shadow-elevation)] py-2 z-50">
-                    <div className="px-4 py-3 border-b border-[var(--color-border-default)]">
+                    <div className="px-4 py-3 border-b border-(--color-border-default)">
                         <p className="text-text-primary font-medium">
                             {user?.name}
                         </p>
-                        <p className="text-[var(--color-text-tertiary)] text-sm">
+                        <p className="text-text-tertiary text-sm">
                             {user?.email}
                         </p>
-                        <p className="text-[var(--color-text-muted)] text-xs mt-1 capitalize">
+                        <p className="text-text-muted text-xs mt-1 capitalize">
                             {user?.role}
                         </p>
                     </div>
@@ -62,7 +62,7 @@ const UserMenu = ({ user }) => {
                         <Link
                             to="/profile"
                             onClick={() => setIsOpen(false)}
-                            className="flex items-center gap-3 px-4 py-2 text-[var(--color-text-secondary)] hover:bg-(--color-brand-primary-100) hover:text-text-primary transition-colors"
+                            className="flex items-center gap-3 px-4 py-2 text-text-secondary hover:bg-(--color-brand-primary-100) hover:text-text-primary transition-colors"
                         >
                             <User className="w-4 h-4" />
                             <span>My Profile</span>
@@ -71,20 +71,20 @@ const UserMenu = ({ user }) => {
                         <Link
                             to="/settings"
                             onClick={() => setIsOpen(false)}
-                            className="flex items-center gap-3 px-4 py-2 text-[var(--color-text-secondary)] hover:bg-(--color-brand-primary-100) hover:text-text-primary transition-colors"
+                            className="flex items-center gap-3 px-4 py-2 text-text-secondary hover:bg-(--color-brand-primary-100) hover:text-text-primary transition-colors"
                         >
                             <Settings className="w-4 h-4" />
                             <span>Settings</span>
                         </Link>
                     </div>
 
-                    <div className="border-t border-[var(--color-border-default)] pt-2">
+                    <div className="border-t border-(--color-border-default) pt-2">
                         <button
                             onClick={() => {
                                 setIsOpen(false);
                                 logout();
                             }}
-                            className="flex items-center gap-3 px-4 py-2 w-full text-[var(--color-danger)] hover:bg-(--color-brand-primary-100) transition-colors"
+                            className="flex items-center gap-3 px-4 py-2 w-full text-danger) hover:bg-(--color-brand-primary-100) transition-colors"
                         >
                             <LogOut className="w-4 h-4" />
                             <span>Logout</span>
