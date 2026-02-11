@@ -15,7 +15,7 @@ import { EmployeesBirthdayCard } from "@/components/common";
 import { LeaveCalendar } from "@/components/common";
 import { employeesBirthday } from "@/data/mockData";
 
-export const HRDashboard = () => {
+export const Dashboard = () => {
     const [loading, setLoading] = useState(true);
     const greeting = useGreeting();
     const user = useAuthStore((state) => state.user);

@@ -1,5 +1,6 @@
 // resources/js/layouts/DashboardLayout.jsx
 import { useEffect } from "react";
+import { Outlet } from "react-router-dom";
 import { useUIStore } from "@/stores";
 import Topbar from "./Topbar";
 import Sidebar from "./Sidebar";
@@ -71,7 +72,7 @@ const DashboardLayout = ({ children }) => {
             >
                 <Topbar />
                 <div className="p-8 bg-brand-primary-light min-h-[calc(100vh-80px)] mt-10">
-                    <div className="mt-5">{children}</div>
+                    <Outlet />
                 </div>
             </main>
         </div>

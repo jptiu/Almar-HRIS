@@ -1,24 +1,16 @@
-// resources/js/layouts/RoleBasedRoute.jsx
-import { Navigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
-import { LoadingOverlay } from "../LoadingSpinner";
+import { Navigate, Outlet } from "react-router-dom";
+import { useAuthStore } from "@/stores";
 
-const RoleBasedRoute = ({ children, allowedRoles = [] }) => {
-    const { isAuthenticated, role, isLoading } = useAuth();
+export default function RoleBasedRoute({ allowedRoles }) {
+    const { user } = useAuthStore();
 
-    if (isLoading) {
-        return <LoadingOverlay message="Verifying access..." />;
-    }
-
-    if (!isAuthenticated) {
+    if (!user) {
         return <Navigate to="/" replace />;
     }
 
-    if (allowedRoles.length > 0 && !allowedRoles.includes(role)) {
-        return <Navigate to={`/${role}/dashboard`} replace />;
+    if (!allowedRoles.includes(user.role)) {
+        return <Navigate to="/unauthorized" replace />;
     }
 
-    return children;
-};
-
-export default RoleBasedRoute;
+    return <Outlet />;
+}

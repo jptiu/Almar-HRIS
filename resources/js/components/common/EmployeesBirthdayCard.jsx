@@ -14,15 +14,16 @@ export const EmployeesBirthdayCard = ({ today, upcoming }) => {
             {/* Scrollable content */}
             <CardContent className="flex-1 flex flex-col gap-6 overflow-y-auto min-h-0 p-6">
                 {/* TODAY */}
-                <p className="text-gray-400 font-semibold mb-4 text-xs">
-                    TODAY'S BIRTHDAYS
+                <div className="text-gray-400 font-semibold mb-4 text-xs">
+                    <p>TODAY'S BIRTHDAYS</p>
+
                     {today && today.length > 0 && (
-                        <p className="mt-2 font-light">
+                        <p className="mt-2 font-light text-gray-500 normal-case text-sm">
                             Wish your colleagues a happy birthday and celebrate
                             their special day! 🎉
                         </p>
                     )}
-                </p>
+                </div>
 
                 {today && today.length > 0 ? (
                     <div>
