@@ -12,9 +12,5 @@ export default function RoleBasedRoute({ allowedRoles }) {
         return <Navigate to="/" replace />;
     }
 
-    if (!allowedRoles.includes(user.role)) {
-        return <Navigate to="/unauthorized" replace />;
-    }
-
     return <Outlet />;
 }

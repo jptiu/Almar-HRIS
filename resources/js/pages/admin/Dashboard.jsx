@@ -12,28 +12,10 @@ import {
     TrendingUp,
     Server,
 } from "lucide-react";
-import api from "../../utils/api";
 
 const AdminDashboard = () => {
     const { user } = useAuth();
     const greeting = useGreeting();
-    const [stats, setStats] = useState(null);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchStats = async () => {
-            try {
-                const response = await api.get("/admin/dashboard");
-                setStats(response.data);
-            } catch (error) {
-                console.error("Failed to fetch stats:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchStats();
-    }, []);
 
     if (loading) {
         return (

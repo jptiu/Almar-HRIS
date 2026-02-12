@@ -5,28 +5,12 @@ import { useGreeting } from "../../../hooks/useGreeting";
 import { Card } from "@/components/ui";
 import { Badge, Button } from "@/components/ui";
 import { CalendarDays, Receipt, Clock, TrendingUp } from "lucide-react";
-import api from "../../../utils/api";
 
 const EmployeeDashboard = () => {
     const { user } = useAuth();
     const greeting = useGreeting();
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchStats = async () => {
-            try {
-                const response = await api.get("/employee/dashboard");
-                setStats(response.data);
-            } catch (error) {
-                console.error("Failed to fetch stats:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchStats();
-    }, []);
 
     if (loading) {
         return (

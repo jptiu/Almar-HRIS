@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { useAuthStore } from "@/stores";
 import { useGreeting } from "../../../../hooks/useGreeting";
-import api from "../../../../utils/api";
 import { Users, UserCheck, CalendarOff, TrendingUp } from "lucide-react";
 import { StatCard } from "@/components/ui";
 import {
@@ -16,75 +15,8 @@ import { LeaveCalendar } from "@/components/common";
 import { employeesBirthday } from "@/data/mockData";
 
 export const Dashboard = () => {
-    const [loading, setLoading] = useState(true);
     const greeting = useGreeting();
     const user = useAuthStore((state) => state.user);
-
-    const today = {
-        day: "10",
-        month: "FEB",
-        name: "David Kim",
-        role: "Marketing Manager",
-        initials: "DK",
-    };
-
-    const upcoming = [
-        {
-            date: "2026-02-11",
-            day: "11",
-            month: "FEB",
-            employees: [
-                {
-                    name: "John Doe",
-                    role: "Marketing Manager",
-                    initials: "JD",
-                    daysLeft: 1,
-                },
-                {
-                    name: "Amarah Smith",
-                    role: "Software Engineer",
-                    initials: "AS",
-                    daysLeft: 1,
-                },
-            ],
-        },
-        {
-            date: "2026-02-20",
-            day: "20",
-            month: "FEB",
-            employees: [
-                {
-                    name: "Kevin Lee",
-                    role: "Technical Lead",
-                    initials: "KL",
-                    daysLeft: 10,
-                },
-            ],
-        },
-    ];
-
-    useEffect(() => {
-        const fetchStats = async () => {
-            try {
-                const response = await api.get("/hr/dashboard");
-                // setStats(response.data);
-            } catch (error) {
-                console.error("Failed to fetch stats:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchStats();
-    }, []);
-
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-100">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"></div>
-            </div>
-        );
-    }
 
     return (
         <div className="space-y-6 animate-fade-in">
