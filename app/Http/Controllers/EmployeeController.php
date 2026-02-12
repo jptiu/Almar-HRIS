@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\PasswordGenerator;
+use App\Helpers\SearchFilter;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\EmployeeRequest;
 use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
@@ -16,11 +18,25 @@ class EmployeeController extends Controller
     /**
      * Display a listing of employees.
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $employees = Employee::with(['user', 'company', 'branch', 'department', 'position', 'manager', 'status'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+        $query = Employee::with(['user', 'company', 'branch', 'department', 'position', 'manager', 'status']);
+
+        $employees = SearchFilter::for($query)
+            ->search($request->query('search')) // automatically searches all $searchable fields
+            ->filters([
+                'company_id' => $request->query('company_id'),
+                'branch_id' => $request->query('branch_id'),
+                'department_id' => $request->query('department_id'),
+                'position_id' => $request->query('position_id'),
+                'manager_id' => $request->query('manager_id'),
+                'employee_status_id' => $request->query('employee_status_id'),
+            ])
+            ->sort(
+                $request->query('sort_field', 'created_at'),
+                $request->query('sort_order', 'desc')
+            )
+            ->paginate((int) $request->query('per_page', 20));
 
         return $this->success(['employees' => $employees], 'Employees retrieved successfully.');
     }
@@ -51,7 +67,7 @@ class EmployeeController extends Controller
             $isAdmin = $request->user()->roles()->where('name', 'admin')->exists();
             $roleName = ($isAdmin && $request->is_manager) ? 'manager' : 'employee';
             $roleId = DB::table('roles')->where('name', $roleName)->value('id');
-            
+
             if ($roleId) {
                 DB::table('user_roles')->insert([
                     'user_id' => $user->id,
@@ -96,7 +112,7 @@ class EmployeeController extends Controller
             ], 'Employee created successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             \Illuminate\Support\Facades\Log::error('Employee Creation Error: ' . $e->getMessage(), [
                 'exception' => $e->getTraceAsString(),
             ]);
@@ -146,15 +162,15 @@ class EmployeeController extends Controller
             // Managers can update employees but cannot change manager role
             if ($request->has('is_manager')) {
                 $isAdmin = $request->user()->roles()->where('name', 'admin')->exists();
-                
+
                 if ($isAdmin) {
                     // Remove existing roles
                     DB::table('user_roles')->where('user_id', $employee->user->id)->delete();
-                    
+
                     // Assign new role based on is_manager flag
                     $roleName = $request->is_manager ? 'manager' : 'employee';
                     $roleId = DB::table('roles')->where('name', $roleName)->value('id');
-                    
+
                     if ($roleId) {
                         DB::table('user_roles')->insert([
                             'user_id' => $employee->user->id,
@@ -195,7 +211,7 @@ class EmployeeController extends Controller
             return $this->success(['employee' => $employee], 'Employee updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             \Illuminate\Support\Facades\Log::error('Employee Update Error: ' . $e->getMessage(), [
                 'exception' => $e->getTraceAsString(),
             ]);
@@ -223,7 +239,7 @@ class EmployeeController extends Controller
             return $this->success(null, 'Employee deleted successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             \Illuminate\Support\Facades\Log::error('Employee Deletion Error: ' . $e->getMessage(), [
                 'exception' => $e->getTraceAsString(),
             ]);
@@ -232,4 +248,3 @@ class EmployeeController extends Controller
         }
     }
 }
-

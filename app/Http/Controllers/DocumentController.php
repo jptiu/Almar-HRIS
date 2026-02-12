@@ -166,30 +166,22 @@ class DocumentController extends Controller
         $documentsQuery = EmployeeDocument::with(['employee', 'documentType', 'uploader']);
 
         $documents = SearchFilter::for($documentsQuery)
-            ->search($request->search)
+            ->search($request->query('search'))
             ->filters([
-                'employee_id' => $request->employee_id,
-                'document_type_id' => $request->document_type_id,
-                'employee.company_id' => $request->company_id,
-                'employee.branch_id' => $request->branch_id,
+                'employee_id' => $request->query('employee_id'),
+                'document_type_id' => $request->query('document_type_id'),
+                'employee.company_id' => $request->query('company_id'),
+                'employee.branch_id' => $request->query('branch_id'),
             ])
-            ->sort($request->sort_by ?? 'created_at', $request->sort_order ?? 'desc')
-            ->paginate($request->per_page ?? 15);
+            ->sort(
+                $request->query('sort_by', 'created_at'),
+                $request->query('sort_order', 'desc')
+            )
+            ->paginate((int) $request->query('per_page', 20));
 
         $documents->getCollection()->transform(fn($doc) => DocumentHelper::appendFormattedSize($doc));
 
-        return $this->success([
-            'documents' => $documents,
-            'filters' => $request->only([
-                'search',
-                'status',
-                'employee_id',
-                'document_type_id',
-                'sort_by',
-                'sort_order',
-                'per_page'
-            ]),
-        ], 'Documents retrieved successfully.');
+        return $this->success(['documents' => $documents], 'Documents retrieved successfully.');
     }
 
     public function show(EmployeeDocument $document)
