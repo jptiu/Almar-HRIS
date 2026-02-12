@@ -25,9 +25,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
-            'role' => \App\Http\Middleware\CheckRole::class,
             'auth.session' => \Illuminate\Session\Middleware\AuthenticateSession::class,
+            'role' => \App\Http\Middleware\CheckRole::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

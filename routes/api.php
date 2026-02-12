@@ -20,7 +20,7 @@ use App\Http\Controllers\DocumentTypeController;
 
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 
-Route::middleware('auth')->group(function () {
+Route::middleware('auth.session')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
