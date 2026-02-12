@@ -29,23 +29,26 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::prefix('me')->group(function () {
-        // Current user info
+
+        // Profile
         Route::get('/', [AuthController::class, 'me']);
         Route::put('/', [AuthController::class, 'updateProfile']);
         Route::post('/logout', [AuthController::class, 'logout']);
 
-        // Documents (full CRUD)
-        Route::get('documents', [DocumentController::class, 'myDocuments']); // list
-        Route::post('documents', [DocumentController::class, 'storeMyDocument']); // upload
-        Route::get('documents/{document}', [DocumentController::class, 'showMyDocument']); // view
-        Route::put('documents/{document}', [DocumentController::class, 'updateMyDocument']); // update
-        Route::delete('documents/{document}', [DocumentController::class, 'deleteMyDocument']); // delete
-        Route::get('documents/{document}/download', [DocumentController::class, 'downloadMyDocument']); // download
+        // My Documents
+        Route::prefix('documents')->group(function () {
+            Route::get('/', [DocumentController::class, 'myDocuments']);
+            Route::post('/', [DocumentController::class, 'storeMyDocument']);
+            Route::get('{document}', [DocumentController::class, 'showMyDocument']);
+            Route::put('{document}', [DocumentController::class, 'updateMyDocument']);
+            Route::delete('{document}', [DocumentController::class, 'deleteMyDocument']);
+            Route::get('{document}/download', [DocumentController::class, 'downloadMyDocument']);
+        });
     });
 
     /*
     |--------------------------------------------------------------------------
-    | System Reference Data (accessible by all authenticated users)
+    | System Reference Data (All Authenticated Users)
     |--------------------------------------------------------------------------
     */
     Route::get('/document-types', [DocumentTypeController::class, 'index']);
@@ -54,71 +57,95 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Admin & Manager Access
+    | Admin & Manager Area
     |--------------------------------------------------------------------------
     */
     Route::middleware('role:admin,manager')->group(function () {
 
-        // Companies (read for manager)
+        /*
+        |--------------------------------------------------------------------------
+        | Companies
+        |--------------------------------------------------------------------------
+        */
+
+        // Read access (admin & manager)
         Route::apiResource('companies', CompanyController::class)
             ->except(['store', 'update', 'destroy']);
-        // Admin-only for create/update/delete
+
+        // Write access (admin only)
         Route::middleware('role:admin')->group(function () {
             Route::apiResource('companies', CompanyController::class)
                 ->only(['store', 'update', 'destroy']);
         });
 
-        // Branches (read for manager)
+        /*
+        |--------------------------------------------------------------------------
+        | Branches
+        |--------------------------------------------------------------------------
+        */
+
         Route::apiResource('branches', BranchController::class)
             ->except(['store', 'update', 'destroy']);
-        // Admin-only for create/update/delete
+
         Route::middleware('role:admin')->group(function () {
             Route::apiResource('branches', BranchController::class)
                 ->only(['store', 'update', 'destroy']);
         });
 
-        // Departments (admin & manager full CRUD)
+        /*
+        |--------------------------------------------------------------------------
+        | Departments
+        |--------------------------------------------------------------------------
+        */
         Route::apiResource('departments', DepartmentController::class);
 
-        // Positions (admin & manager full CRUD)
+        /*
+        |--------------------------------------------------------------------------
+        | Positions
+        |--------------------------------------------------------------------------
+        */
         Route::apiResource('positions', PositionController::class);
 
-        // Employees (admin & manager full CRUD)
+        /*
+        |--------------------------------------------------------------------------
+        | Employees
+        |--------------------------------------------------------------------------
+        */
         Route::apiResource('employees', EmployeeController::class);
 
         /*
         |--------------------------------------------------------------------------
-        | Admin/HR Employee Documents (read-only)
+        | Employee Documents (Unified REST Resource)
         |--------------------------------------------------------------------------
         */
-        Route::prefix('employees/{employee}')->group(function () {
-            Route::get('documents', [DocumentController::class, 'index']); // list
-            Route::get('documents/{document}', [DocumentController::class, 'show']); // view
-            Route::get('documents/{document}/download', [DocumentController::class, 'download']); // download
+        Route::prefix('documents')->group(function () {
+
+            // List all documents (filterable)
+            Route::get('/', [DocumentController::class, 'index']);
+
+            // View specific document
+            Route::get('{document}', [DocumentController::class, 'show']);
+
+            // Download
+            Route::get('{document}/download', [DocumentController::class, 'download']);
         });
 
         /*
         |--------------------------------------------------------------------------
-        | Dashboard Analytics
+        | Dashboard
         |--------------------------------------------------------------------------
         */
         Route::prefix('dashboard')->group(function () {
-            // Complete dashboard overview
-            Route::get('/overview', [DashboardController::class, 'overview']);
 
-            // Statistics
+            Route::get('/overview', [DashboardController::class, 'overview']);
             Route::get('/stats', [DashboardController::class, 'stats']);
 
-            // Distribution endpoints (with percentages)
             Route::get('/employees-by-status', [DashboardController::class, 'employeesByStatus']);
             Route::get('/employees-by-department', [DashboardController::class, 'employeesByDepartment']);
             Route::get('/employees-by-branch', [DashboardController::class, 'employeesByBranch']);
             Route::get('/employees-by-position', [DashboardController::class, 'employeesByPosition']);
 
-            // Recent activity
             Route::get('/recent-hires', [DashboardController::class, 'recentHires']);
-
-            // Trends
             Route::get('/hiring-trends', [DashboardController::class, 'hiringTrends']);
 
             // Salary analytics (admin only)

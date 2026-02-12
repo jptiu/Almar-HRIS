@@ -23,10 +23,10 @@ return new class extends Migration
 
         // Update employee_documents table to reference document_types
         Schema::table('employee_documents', function (Blueprint $table) {
-            $table->foreign('document_type')
-                ->references('slug')
+            $table->foreign('document_type_id')
+                ->references('id')
                 ->on('document_types')
-                ->onDelete('restrict');
+                ->onDelete('cascade');
         });
     }
 
@@ -36,7 +36,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('employee_documents', function (Blueprint $table) {
-            $table->dropForeign(['document_type']);
+            $table->dropForeign(['document_type_id']);
         });
 
         Schema::dropIfExists('document_types');

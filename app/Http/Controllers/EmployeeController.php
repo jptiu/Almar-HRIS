@@ -18,7 +18,7 @@ class EmployeeController extends Controller
      */
     public function index(): JsonResponse
     {
-        $employees = Employee::with(['user', 'company', 'branch', 'position', 'manager', 'status', 'documents'])
+        $employees = Employee::with(['user', 'company', 'branch', 'department', 'position', 'manager', 'status'])
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 

@@ -7,18 +7,21 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class EmployeeDocument extends Model
 {
+    // Add uploaded_by to fillable so it can be mass assigned
     protected $fillable = [
         'employee_id',
-        'document_type',
+        'document_type_id',
         'file_name',
         'file_path',
         'file_size',
         'mime_type',
         'description',
+        'uploaded_by',
     ];
 
     protected $casts = [
         'file_size' => 'integer',
+        'uploaded_by' => 'integer', // optional, for safety
     ];
 
     /**
@@ -42,7 +45,7 @@ class EmployeeDocument extends Model
      */
     public function documentType(): BelongsTo
     {
-        return $this->belongsTo(DocumentType::class, 'document_type', 'slug');
+        return $this->belongsTo(DocumentType::class);
     }
 
     /**
@@ -82,16 +85,11 @@ class EmployeeDocument extends Model
         ];
     }
 
-    /**
-     * Get document types for employees.
-     * Fetches from database.
-     */
-    public static function documentTypes(): array
-    {
-        return DocumentType::where('is_active', true)
-            ->orderBy('sort_order')
-            ->pluck('name', 'slug')
-            ->toArray();
-    }
+    public array $searchable = [
+        'file_name',
+        'description',
+        'employee.first_name',
+        'employee.last_name',
+        'documentType.name',
+    ];
 }
-
