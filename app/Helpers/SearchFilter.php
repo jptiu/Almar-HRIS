@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
+use ReflectionProperty;
 
 class SearchFilter
 {
@@ -34,21 +35,23 @@ class SearchFilter
     {
         if (!$term) return $this;
 
-        // Use default searchable columns from model if none passed
-        if (empty($columns) && property_exists($this->query->getModel(), 'searchable')) {
-            $columns = $this->query->getModel()->searchable;
+        if (empty($columns)) {
+            $model = $this->query->getModel();
+
+            if (property_exists($model, 'searchable')) {
+                $ref = new \ReflectionProperty($model, 'searchable');
+                $columns = $ref->getValue($model); // pass model object
+            }
         }
 
-        if (empty($columns)) return $this; // Nothing to search
+        if (empty($columns)) return $this;
 
         $this->query->where(function ($q) use ($term, $columns) {
             foreach ($columns as $column) {
                 if (str_contains($column, '.')) {
-                    // Related field: relation.column
                     [$relation, $relColumn] = explode('.', $column);
                     $q->orWhereHas($relation, fn($rq) => $rq->where($relColumn, 'like', "%{$term}%"));
                 } else {
-                    // Direct column
                     $q->orWhere($column, 'like', "%{$term}%");
                 }
             }
@@ -61,7 +64,7 @@ class SearchFilter
      * Apply exact-match filters from flat query params
      * Example: ['status' => 'approved', 'employee_id' => 1]
      */
-    public function filters(array $filters)
+    public function filters(array $filters): self
     {
         foreach ($filters as $column => $value) {
             if (empty($value)) continue;

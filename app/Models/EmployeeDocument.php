@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class EmployeeDocument extends Model
 {
-    // Add uploaded_by to fillable so it can be mass assigned
+    // Fillable fields for mass assignment
     protected $fillable = [
         'employee_id',
         'document_type_id',
@@ -19,9 +19,19 @@ class EmployeeDocument extends Model
         'uploaded_by',
     ];
 
+    // Casts for proper data types
     protected $casts = [
         'file_size' => 'integer',
         'uploaded_by' => 'integer', // optional, for safety
+    ];
+
+    // Protected searchable fields for global search
+    protected $searchable = [
+        'file_name',
+        'description',
+        'employee.first_name',
+        'employee.last_name',
+        'documentType.name',
     ];
 
     /**
@@ -84,12 +94,4 @@ class EmployeeDocument extends Model
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         ];
     }
-
-    public array $searchable = [
-        'file_name',
-        'description',
-        'employee.first_name',
-        'employee.last_name',
-        'documentType.name',
-    ];
 }

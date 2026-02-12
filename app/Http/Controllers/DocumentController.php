@@ -168,7 +168,6 @@ class DocumentController extends Controller
         $documents = SearchFilter::for($documentsQuery)
             ->search($request->search)
             ->filters([
-                'status' => $request->status,
                 'employee_id' => $request->employee_id,
                 'document_type_id' => $request->document_type_id,
                 'employee.company_id' => $request->company_id,
