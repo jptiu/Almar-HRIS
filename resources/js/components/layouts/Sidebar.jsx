@@ -11,7 +11,7 @@ const Sidebar = () => {
     const mobileMenuOpen = useUIStore((state) => state.mobileMenuOpen);
     const closeMobileMenu = useUIStore((state) => state.closeMobileMenu);
 
-    const role = useAuthStore((state) => state.role);
+    const role = useAuthStore((state) => state.user?.role) || "employee";
     const isMobile = useMediaQuery("(max-width: 768px)");
 
     const navItems = navigationConfig[role] || [];

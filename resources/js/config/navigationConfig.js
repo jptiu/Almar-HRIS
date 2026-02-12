@@ -123,6 +123,70 @@ export const navigationConfig = {
     },
   ],
 
+  manager: [
+    {
+      label: 'Dashboard',
+      icon: LayoutDashboard,
+      path: '/hr/dashboard',
+    },
+    {
+      label: 'Employees',
+      icon: Users,
+      path: '/hr/employees',
+    },
+    {
+      label: 'Documents',
+      icon: FileText,
+      path: '/hr/documents',
+    },
+    {
+      label: 'Attendance',
+      icon: Clock,
+      path: '/hr/attendance',
+      // badge: '5', // Example badge for pending requests
+    },
+    {
+      label: 'Leave Credits',
+      icon: Calendar,
+      path: '/hr/leave-credits',
+    },
+    {
+      label: 'Requests',
+      icon: ClipboardList,
+      path: '/hr/requests',
+    },
+    {
+      label: 'Concerns',
+      icon: Info,
+      path: '/hr/concerns',
+    },
+    {
+      label: 'Payroll',
+      icon: DollarSign,
+      path: '/hr/payroll',
+    },
+    {
+      label: 'Contributions',
+      icon: Coins,
+      path: '/hr/contributions',
+    },
+    {
+      label: 'Salary Management',
+      icon: CreditCard,
+      path: '/hr/salary-management',
+    },
+    {
+      label: 'Announcements',
+      icon: Megaphone,
+      path: '/hr/announcements',
+    },
+    {
+      label: 'Settings',
+      icon: Settings,
+      path: '/hr/settings',
+    },
+  ],
+
   employee: [
     {
       label: 'My Dashboard',

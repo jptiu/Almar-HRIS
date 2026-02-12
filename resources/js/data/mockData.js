@@ -319,7 +319,7 @@ export const leaveRequests = [
 export const employeesBirthday = {
   today: [
     {
-      date: "FEB 10",
+      date: "FEB 11",
       employees: [
         {
           id: 1,
@@ -345,14 +345,14 @@ export const employeesBirthday = {
           firstName: "Sarah",
           lastName: "Lee",
           role: "UI/UX Designer",
-          daysLeft: 5,
+          daysLeft: 4,
         },
         {
           id: 3,
           firstName: "John",
           lastName: "Doe",
           role: "UI/UX Designer",
-          daysLeft: 5,
+          daysLeft: 4,
         },
       ],
     },
@@ -364,7 +364,7 @@ export const employeesBirthday = {
           firstName: "Alex",
           lastName: "Thompson",
           role: "Software Engineer",
-          daysLeft: 12,
+          daysLeft: 11,
         },
       ],
     },

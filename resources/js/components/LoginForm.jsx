@@ -1,11 +1,74 @@
 import React, { useState } from "react";
 import { Mail, Eye, EyeOff } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+
 import InputField from "./ui/InputField";
+import { loginApi } from "@/services/authService";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function LoginForm() {
+    const navigate = useNavigate();
+    const setUser = useAuthStore((state) => state.setUser);
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+
+    const { mutate, isPending } = useMutation({
+        mutationFn: loginApi,
+
+        onSuccess: (response) => {
+            if (!response.success) {
+                toast.error(response.message || "Login failed");
+                return;
+            }
+
+            // Save user data
+            const userData = response.data;
+            const userRole = userData.roles?.[0] ?? null;
+
+            useAuthStore.getState().setUser(userData);
+
+            toast.success("Login successful");
+
+            // Redirect based on user role
+            switch (userRole) {
+                case "admin":
+                    navigate("/admin/dashboard", { replace: true });
+                    break;
+                case "hr":
+                case "manager":
+                    navigate("/hr/dashboard", { replace: true });
+                    break;
+                case "employee":
+                    navigate("/employee/dashboard", { replace: true });
+                    break;
+                default:
+                    // Fallback to employee dashboard for unknown roles
+                    navigate("/employee/dashboard", { replace: true });
+                    break;
+            }
+        },
+
+        onError: (error) => {
+            const message =
+                error?.response?.data?.message || "Something went wrong";
+            toast.error(message);
+        },
+    });
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        if (!email || !password) {
+            toast.error("Email and password are required");
+            return;
+        }
+
+        mutate({ email, password });
+    };
 
     return (
         <div className="w-full max-w-sm">
@@ -22,12 +85,12 @@ export default function LoginForm() {
                     <h2 className="text-text-primary text-2xl md:text-3xl font-bold pb-5">
                         Welcome.
                     </h2>
-                    <h2 className="text-text-secondary text-sm md:text-sm font-light">
+                    <h2 className="text-text-secondary text-sm font-light">
                         Sign in to access your account
                     </h2>
                 </div>
 
-                <form className="space-y-4">
+                <form className="space-y-4" onSubmit={handleSubmit}>
                     <InputField
                         label="Email"
                         type="email"
@@ -44,7 +107,7 @@ export default function LoginForm() {
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        isPassword={true}
+                        isPassword
                         showPassword={showPassword}
                         togglePassword={() => setShowPassword((prev) => !prev)}
                         rightIcon={showPassword ? EyeOff : Eye}
@@ -54,11 +117,10 @@ export default function LoginForm() {
                     <div className="flex gap-4 pt-6">
                         <button
                             type="submit"
-                            className="relative overflow-hidden flex-1 bg-brand-primary text-text-primary py-3 rounded-2xl font-medium cursor-pointer transition-all duration-300 ease-out hover:bg-brand-primary-hover hover:shadow-[0_12px_40px_var(--color-shadow-primary)] active:scale-[0.98]"
+                            disabled={isPending}
+                            className="relative overflow-hidden flex-1 bg-brand-primary text-text-primary py-3 rounded-2xl font-medium cursor-pointer transition-all duration-300 ease-out hover:bg-brand-primary-hover hover:shadow-[0_12px_40px_var(--color-shadow-primary)] active:scale-[0.98] disabled:opacity-50"
                         >
-                            Log In
-                            <span className="pointer-events-none absolute inset-0 rounded-2xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.35)]"></span>
-                            <span className="pointer-events-none absolute bottom-0 right-0 h-full w-1/2 bg-linear-to-tr from-white/0 via-white/10 to-white/40 blur-2xl opacity-70"></span>
+                            {isPending ? "Logging in..." : "Log In"}
                         </button>
                     </div>
                 </form>
