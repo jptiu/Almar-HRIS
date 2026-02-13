@@ -2,11 +2,18 @@
 import axios from "axios";
 import { useAuthStore } from "@/stores/authStore";
 
+// Grab CSRF token from meta tag
+const token = document
+  .querySelector('meta[name="csrf-token"]')
+  ?.getAttribute("content");
+
 const axiosInstance = axios.create({
   baseURL: "/api",
-  withCredentials: true, // <-- sends laravel-session cookie
+  withCredentials: true, // sends laravel-session cookie
   headers: {
     "Content-Type": "application/json",
+    "X-Requested-With": "XMLHttpRequest",
+    ...(token && { "X-CSRF-TOKEN": token }),
   },
 });
 

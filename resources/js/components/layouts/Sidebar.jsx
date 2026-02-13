@@ -11,7 +11,8 @@ const Sidebar = () => {
     const mobileMenuOpen = useUIStore((state) => state.mobileMenuOpen);
     const closeMobileMenu = useUIStore((state) => state.closeMobileMenu);
 
-    const role = useAuthStore((state) => state.user?.role) || "employee";
+    const role = useAuthStore((state) => state.user?.primaryRole) || "employee";
+    const user = useAuthStore((state) => state.user);
     const isMobile = useMediaQuery("(max-width: 768px)");
 
     const navItems = navigationConfig[role] || [];
@@ -158,10 +159,10 @@ const Sidebar = () => {
                     {(!sidebarCollapsed || mobileMenuOpen) && (
                         <div className="flex-1 min-w-0">
                             <p className="text-white text-sm font-medium truncate">
-                                {useAuthStore.getState().user?.name || "admin"}
+                                {user?.full_name || user?.name || "Admin"}
                             </p>
                             <p className="text-gray-400 text-xs truncate">
-                                Test Position
+                                {user?.position || user?.primaryRole || "Employee"}
                             </p>
                         </div>
                     )}

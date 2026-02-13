@@ -23,7 +23,7 @@ export const Dashboard = () => {
             {/* Welcome Header */}
             <div>
                 <h1 className="text-2xl font-bold text-text-dark mb-2">
-                    {greeting}, {user?.name || "admin"}!
+                    {greeting}, {user?.full_name || "admin"}!
                 </h1>
                 <p className="text-text-tertiary">
                     Here's what's happening with your company today.

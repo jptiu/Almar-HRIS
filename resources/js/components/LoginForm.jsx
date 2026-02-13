@@ -25,15 +25,12 @@ export default function LoginForm() {
                 return;
             }
 
-            // Save user data
             const userData = response.data;
-            const userRole = userData.roles?.[0] ?? null;
-
-            useAuthStore.getState().setUser(userData);
+            setUser(userData);
 
             toast.success("Login successful");
 
-            // Redirect based on user role
+            const userRole = userData.roles?.[0] ?? null;
             switch (userRole) {
                 case "admin":
                     navigate("/admin/dashboard", { replace: true });
@@ -46,13 +43,13 @@ export default function LoginForm() {
                     navigate("/employee/dashboard", { replace: true });
                     break;
                 default:
-                    // Fallback to employee dashboard for unknown roles
                     navigate("/employee/dashboard", { replace: true });
                     break;
             }
         },
 
         onError: (error) => {
+            console.error("Login error:", error); // Debugging line
             const message =
                 error?.response?.data?.message || "Something went wrong";
             toast.error(message);
