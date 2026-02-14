@@ -4,14 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Helpers\PasswordGenerator;
 use App\Helpers\SearchFilter;
-use App\Http\Controllers\Controller;
 use App\Http\Requests\EmployeeRequest;
 use App\Models\Employee;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class EmployeeController extends Controller
 {
@@ -20,10 +21,18 @@ class EmployeeController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Employee::with(['user', 'company', 'branch', 'department', 'position', 'manager', 'status']);
+        $query = Employee::with([
+            'user',
+            'company',
+            'branch',
+            'department',
+            'position',
+            'manager',
+            'status'
+        ]);
 
         $employees = SearchFilter::for($query)
-            ->search($request->query('search')) // automatically searches all $searchable fields
+            ->search($request->query('search'))
             ->filters([
                 'company_id' => $request->query('company_id'),
                 'branch_id' => $request->query('branch_id'),
@@ -43,62 +52,60 @@ class EmployeeController extends Controller
 
     /**
      * Store a newly created employee with user account.
-     * Creates employee with "employee" or "manager" role based on is_manager flag (admin only).
-     * Managers can create employees but cannot assign manager role.
-     * Password is auto-generated if not provided.
+     * - Always assigns "employee" role
+     * - If admin + is_manager = true → assigns "employee" + "manager"
      */
     public function store(EmployeeRequest $request): JsonResponse
     {
         try {
             DB::beginTransaction();
 
-            // Generate password if not provided
             $password = $request->password ?? PasswordGenerator::generate();
 
-            // Create user
             $user = User::create([
                 'email' => $request->email,
                 'password' => Hash::make($password),
                 'is_active' => true,
             ]);
 
-            // Determine role based on is_manager flag (admin only)
-            // Managers can create employees but cannot assign manager role
-            $isAdmin = $request->user()->roles()->where('name', 'admin')->exists();
-            $roleName = ($isAdmin && $request->is_manager) ? 'manager' : 'employee';
-            $roleId = DB::table('roles')->where('name', $roleName)->value('id');
+            $isAdmin = $request->user()
+                ->roles()
+                ->where('name', 'admin')
+                ->exists();
 
-            if ($roleId) {
-                DB::table('user_roles')->insert([
-                    'user_id' => $user->id,
-                    'role_id' => $roleId,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
+            $roleNames = ['employee'];
+
+            if ($isAdmin && $request->boolean('is_manager')) {
+                $roleNames[] = 'manager';
             }
 
-            // Create employee record
+            $roleIds = Role::whereIn('name', $roleNames)->pluck('id');
+
+            $user->roles()->syncWithoutDetaching($roleIds);
+
             $employee = Employee::create([
                 'user_id' => $user->id,
                 'created_by' => $request->user()->id,
-                'company_id' => $request->company_id,
-                'branch_id' => $request->branch_id,
-                'position_id' => $request->position_id,
-                'manager_id' => $request->manager_id,
-                'employee_status_id' => $request->employee_status_id,
-                'first_name' => $request->first_name,
-                'last_name' => $request->last_name,
-                'middle_name' => $request->middle_name,
-                'address_line_1' => $request->address_line_1,
-                'address_line_2' => $request->address_line_2,
-                'city' => $request->city,
-                'state' => $request->state,
-                'postal_code' => $request->postal_code,
-                'country' => $request->country,
-                'phone' => $request->phone,
-                'hire_date' => $request->hire_date,
-                'birthdate' => $request->birthdate,
-                'base_salary' => $request->base_salary,
+                ...$request->only([
+                    'company_id',
+                    'branch_id',
+                    'position_id',
+                    'manager_id',
+                    'employee_status_id',
+                    'first_name',
+                    'last_name',
+                    'middle_name',
+                    'address_line_1',
+                    'address_line_2',
+                    'city',
+                    'state',
+                    'postal_code',
+                    'country',
+                    'phone',
+                    'hire_date',
+                    'birthdate',
+                    'base_salary',
+                ])
             ]);
 
             $employee->load(['user', 'company', 'branch', 'position']);
@@ -108,13 +115,14 @@ class EmployeeController extends Controller
             return $this->created([
                 'employee' => $employee,
                 'generated_password' => $password,
-                'password_note' => 'Password was auto-generated. Please share this with the employee securely.',
+                'password_note' => 'Password was auto-generated. Please share this securely.',
             ], 'Employee created successfully.');
+
         } catch (\Exception $e) {
             DB::rollBack();
 
-            \Illuminate\Support\Facades\Log::error('Employee Creation Error: ' . $e->getMessage(), [
-                'exception' => $e->getTraceAsString(),
+            Log::error('Employee Creation Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return $this->serverError('An error occurred while creating the employee.');
@@ -126,94 +134,99 @@ class EmployeeController extends Controller
      */
     public function show($employee): JsonResponse
     {
-        $employee = Employee::with(['user', 'company', 'branch', 'position', 'manager', 'creator', 'status'])
-            ->findOrFail($employee);
+        $employee = Employee::with([
+            'user',
+            'company',
+            'branch',
+            'position',
+            'manager',
+            'creator',
+            'status'
+        ])->findOrFail($employee);
 
         return $this->success(['employee' => $employee], 'Employee retrieved successfully.');
     }
 
     /**
      * Update the specified employee.
-     * Also updates user role based on is_manager flag (admin only).
-     * Managers can update employees but cannot change manager role.
+     * - Admin can toggle manager role
+     * - Manager cannot modify manager role
      */
     public function update(EmployeeRequest $request, $employee): JsonResponse
     {
         try {
-            $employee = Employee::findOrFail($employee);
-
             DB::beginTransaction();
 
-            // Update user email if provided
-            if ($request->has('email')) {
-                $employee->user->update([
+            $employee = Employee::with('user')->findOrFail($employee);
+            $user = $employee->user;
+
+            if ($request->filled('email')) {
+                $user->update([
                     'email' => $request->email,
                 ]);
             }
 
-            // Update user password if provided
-            if ($request->has('password') && $request->password) {
-                $employee->user->update([
+            if ($request->filled('password')) {
+                $user->update([
                     'password' => Hash::make($request->password),
                 ]);
             }
 
-            // Update role if is_manager is provided (admin only)
-            // Managers can update employees but cannot change manager role
             if ($request->has('is_manager')) {
-                $isAdmin = $request->user()->roles()->where('name', 'admin')->exists();
+
+                $isAdmin = $request->user()
+                    ->roles()
+                    ->where('name', 'admin')
+                    ->exists();
 
                 if ($isAdmin) {
-                    // Remove existing roles
-                    DB::table('user_roles')->where('user_id', $employee->user->id)->delete();
 
-                    // Assign new role based on is_manager flag
-                    $roleName = $request->is_manager ? 'manager' : 'employee';
-                    $roleId = DB::table('roles')->where('name', $roleName)->value('id');
+                    $roleNames = ['employee'];
 
-                    if ($roleId) {
-                        DB::table('user_roles')->insert([
-                            'user_id' => $employee->user->id,
-                            'role_id' => $roleId,
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ]);
+                    if ($request->boolean('is_manager')) {
+                        $roleNames[] = 'manager';
                     }
+
+                    $roleIds = Role::whereIn('name', $roleNames)->pluck('id');
+
+                    $user->roles()->sync($roleIds);
                 }
             }
 
-            // Update employee record
-            $employee->update([
-                'company_id' => $request->company_id ?? $employee->company_id,
-                'branch_id' => $request->branch_id ?? $employee->branch_id,
-                'position_id' => $request->position_id ?? $employee->position_id,
-                'manager_id' => $request->manager_id ?? $employee->manager_id,
-                'employee_status_id' => $request->employee_status_id ?? $employee->employee_status_id,
-                'first_name' => $request->first_name ?? $employee->first_name,
-                'last_name' => $request->last_name ?? $employee->last_name,
-                'middle_name' => $request->middle_name ?? $employee->middle_name,
-                'address_line_1' => $request->address_line_1 ?? $employee->address_line_1,
-                'address_line_2' => $request->address_line_2 ?? $employee->address_line_2,
-                'city' => $request->city ?? $employee->city,
-                'state' => $request->state ?? $employee->state,
-                'postal_code' => $request->postal_code ?? $employee->postal_code,
-                'country' => $request->country ?? $employee->country,
-                'phone' => $request->phone ?? $employee->phone,
-                'hire_date' => $request->hire_date ?? $employee->hire_date,
-                'birthdate' => $request->birthdate ?? $employee->birthdate,
-                'base_salary' => $request->base_salary ?? $employee->base_salary,
-            ]);
+            $employee->update(
+                $request->only([
+                    'company_id',
+                    'branch_id',
+                    'position_id',
+                    'manager_id',
+                    'employee_status_id',
+                    'first_name',
+                    'last_name',
+                    'middle_name',
+                    'address_line_1',
+                    'address_line_2',
+                    'city',
+                    'state',
+                    'postal_code',
+                    'country',
+                    'phone',
+                    'hire_date',
+                    'birthdate',
+                    'base_salary',
+                ])
+            );
 
             $employee->load(['user', 'company', 'branch', 'position']);
 
             DB::commit();
 
             return $this->success(['employee' => $employee], 'Employee updated successfully.');
+
         } catch (\Exception $e) {
             DB::rollBack();
 
-            \Illuminate\Support\Facades\Log::error('Employee Update Error: ' . $e->getMessage(), [
-                'exception' => $e->getTraceAsString(),
+            Log::error('Employee Update Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return $this->serverError('An error occurred while updating the employee.');
@@ -222,26 +235,26 @@ class EmployeeController extends Controller
 
     /**
      * Remove the specified employee.
-     * Only admin can delete employees.
+     * Only admin should be allowed via middleware/policy.
      */
     public function destroy($employee): JsonResponse
     {
-        $employee = Employee::findOrFail($employee);
-
         try {
             DB::beginTransaction();
 
-            // Delete user (will cascade delete employee due to foreign key)
+            $employee = Employee::with('user')->findOrFail($employee);
+
             $employee->user->delete();
 
             DB::commit();
 
             return $this->success(null, 'Employee deleted successfully.');
+
         } catch (\Exception $e) {
             DB::rollBack();
 
-            \Illuminate\Support\Facades\Log::error('Employee Deletion Error: ' . $e->getMessage(), [
-                'exception' => $e->getTraceAsString(),
+            Log::error('Employee Deletion Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return $this->serverError('An error occurred while deleting the employee.');
