@@ -63,5 +63,42 @@ class User extends Authenticatable
     {
         return $this->hasOne(Employee::class);
     }
+
+        /**
+     * Check if user has a specific role
+     */
+    public function hasRole(string $role): bool
+    {
+        return $this->roles->contains('name', $role);
+    }
+
+    /**
+     * Check if user has any of the given roles
+     */
+    public function hasAnyRole(array $roles): bool
+    {
+        return $this->roles->pluck('name')->intersect($roles)->isNotEmpty();
+    }
+
+    /**
+     * Get the currently active role from session
+     */
+    public function getActiveRole(): ?string
+    {
+        return session('active_role');
+    }
+
+    /**
+     * Set the active role in session (only if user owns it)
+     */
+    public function setActiveRole(string $role): bool
+    {
+        if (!$this->hasRole($role)) {
+            return false;
+        }
+
+        session(['active_role' => $role]);
+        return true;
+    }
 }
 

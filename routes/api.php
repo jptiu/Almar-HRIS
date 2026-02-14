@@ -35,6 +35,8 @@ Route::middleware('auth.session')->group(function () {
         Route::put('/', [AuthController::class, 'updateProfile']);
         Route::post('/logout', [AuthController::class, 'logout']);
 
+        Route::post('/switch-role', [AuthController::class, 'switchRole']);
+        
         // My Documents
         Route::prefix('documents')->group(function () {
             Route::get('/', [DocumentController::class, 'myDocuments']);
