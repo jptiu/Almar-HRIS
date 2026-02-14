@@ -36,6 +36,19 @@ class Employee extends Model
         'base_salary' => 'decimal:2',
     ];
 
+    // Protected searchable fields for automatic global search
+    protected $searchable = [
+        'first_name',
+        'last_name',
+        'middle_name',
+        'user.email',
+        'company.name',
+        'branch.name',
+        'department.name',
+        'position.title',
+    ];
+
+    // Relationships
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -61,43 +74,28 @@ class Employee extends Model
         return $this->belongsTo(Position::class);
     }
 
-    /**
-     * Get the manager of this employee.
-     */
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
     public function manager()
     {
         return $this->belongsTo(Employee::class, 'manager_id');
     }
 
-    /**
-     * Get the subordinates of this employee.
-     */
     public function subordinates()
     {
         return $this->hasMany(Employee::class, 'manager_id');
     }
 
-    /**
-     * Get the employment status of this employee.
-     */
     public function status()
     {
         return $this->belongsTo(EmployeeStatus::class, 'employee_status_id');
     }
 
-    /**
-     * Get the documents for this employee.
-     */
     public function documents()
     {
         return $this->hasMany(EmployeeDocument::class);
-    }
-
-    /**
-     * Get the department directly.
-     */
-    public function department()
-    {
-        return $this->belongsTo(Department::class);
     }
 }

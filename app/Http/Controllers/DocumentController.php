@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use App\Http\Requests\DocumentRequest;
 use App\Models\Employee;
 use App\Models\EmployeeDocument;
+use App\Models\DocumentType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Helpers\SearchFilter;
+use App\Helpers\DocumentHelper;
 
 class DocumentController extends Controller
 {
@@ -19,17 +22,24 @@ class DocumentController extends Controller
     {
         $employee = $request->user()->employee;
 
-        $documents = EmployeeDocument::where('employee_id', $employee->id)
-            ->with('uploader:id,name,email')
-            ->orderByDesc('created_at')
-            ->get()
-            ->map(function ($doc) {
-                $doc->formatted_size = $doc->formatted_size;
-                $doc->document_type_label = EmployeeDocument::documentTypes()[$doc->document_type] ?? $doc->document_type;
-                return $doc;
-            });
+        $documentsQuery = EmployeeDocument::where('employee_id', $employee->id)
+            ->with(['uploader:id,name,email', 'documentType']);
 
-        return $this->success(['documents' => $documents], 'Your documents retrieved successfully.');
+        $documents = SearchFilter::for($documentsQuery)
+            ->search($request->search) // global search
+            ->filters([                // optional filters
+                'status' => $request->status,
+                'document_type_id' => $request->document_type_id,
+            ])
+            ->sort($request->sort_by ?? 'created_at', $request->sort_order ?? 'desc')
+            ->paginate($request->per_page ?? 15);
+
+        $documents->getCollection()->transform(fn($doc) => DocumentHelper::appendFormattedSize($doc));
+
+        return $this->success([
+            'documents' => $documents,
+            'filters' => $request->only(['search', 'status', 'document_type_id', 'sort_by', 'sort_order', 'per_page']),
+        ], 'Your documents retrieved successfully.');
     }
 
     public function storeMyDocument(DocumentRequest $request)
@@ -39,15 +49,15 @@ class DocumentController extends Controller
         DB::beginTransaction();
         try {
             $file = $request->file('file');
-            $documentType = $request->document_type;
+            $documentType = DocumentType::findOrFail($request->document_type_id);
 
-            $fileName = $this->generateUniqueFileName($file);
-            $directory = "employee_documents/{$employee->id}/{$documentType}";
+            $fileName = DocumentHelper::generateUniqueFileName($file);
+            $directory = "employee/{$employee->id}/documents/{$documentType->slug}";
             $filePath = $file->storeAs($directory, $fileName, 'private');
 
             $document = EmployeeDocument::create([
                 'employee_id' => $employee->id,
-                'document_type' => $documentType,
+                'document_type_id' => $documentType->id,
                 'file_name' => $file->getClientOriginalName(),
                 'file_path' => $filePath,
                 'file_size' => $file->getSize(),
@@ -56,8 +66,8 @@ class DocumentController extends Controller
                 'uploaded_by' => $request->user()->id,
             ]);
 
+            $document->load('documentType');
             $document->formatted_size = $document->formatted_size;
-            $document->document_type_label = EmployeeDocument::documentTypes()[$documentType] ?? $documentType;
 
             DB::commit();
 
@@ -75,11 +85,10 @@ class DocumentController extends Controller
 
         $document = EmployeeDocument::where('employee_id', $employee->id)
             ->where('id', $documentId)
-            ->with('uploader:id,name,email')
+            ->with(['uploader:id,name,email', 'documentType'])
             ->firstOrFail();
 
         $document->formatted_size = $document->formatted_size;
-        $document->document_type_label = EmployeeDocument::documentTypes()[$document->document_type] ?? $document->document_type;
 
         return $this->success(['document' => $document], 'Document retrieved successfully.');
     }
@@ -92,13 +101,16 @@ class DocumentController extends Controller
             ->where('id', $documentId)
             ->firstOrFail();
 
-        $document->update([
-            'description' => $request->description,
-            'document_type' => $request->document_type ?? $document->document_type,
-        ]);
+        $updateData = [];
+        if ($request->has('description')) $updateData['description'] = $request->description;
+        if ($request->has('document_type_id')) $updateData['document_type_id'] = $request->document_type_id;
+
+        if (!empty($updateData)) {
+            $document->update($updateData);
+            $document->load('documentType');
+        }
 
         $document->formatted_size = $document->formatted_size;
-        $document->document_type_label = EmployeeDocument::documentTypes()[$document->document_type] ?? $document->document_type;
 
         return $this->success(['document' => $document], 'Document updated successfully.');
     }
@@ -147,48 +159,43 @@ class DocumentController extends Controller
     }
 
     // ==========================
-    // Admin/HR Read-Only Methods
+    // Admin / Manager
     // ==========================
-    public function index($employeeId)
+    public function index(Request $request)
     {
-        $employee = Employee::findOrFail($employeeId);
+        $documentsQuery = EmployeeDocument::with(['employee', 'documentType', 'uploader']);
 
-        $documents = EmployeeDocument::where('employee_id', $employeeId)
-            ->with('uploader:id,name,email')
-            ->orderByDesc('created_at')
-            ->get()
-            ->map(function ($doc) {
-                $doc->formatted_size = $doc->formatted_size;
-                $doc->document_type_label = EmployeeDocument::documentTypes()[$doc->document_type] ?? $doc->document_type;
-                return $doc;
-            });
+        $documents = SearchFilter::for($documentsQuery)
+            ->search($request->query('search'))
+            ->filters([
+                'employee_id' => $request->query('employee_id'),
+                'document_type_id' => $request->query('document_type_id'),
+                'employee.company_id' => $request->query('company_id'),
+                'employee.branch_id' => $request->query('branch_id'),
+            ])
+            ->sort(
+                $request->query('sort_by', 'created_at'),
+                $request->query('sort_order', 'desc')
+            )
+            ->paginate((int) $request->query('per_page', 20));
 
-        return $this->success(['documents' => $documents], 'Employee documents retrieved successfully.');
+        $documents->getCollection()->transform(fn($doc) => DocumentHelper::appendFormattedSize($doc));
+
+        return $this->success(['documents' => $documents], 'Documents retrieved successfully.');
     }
 
-    public function show($employeeId, $documentId)
+    public function show(EmployeeDocument $document)
     {
-        $employee = Employee::findOrFail($employeeId);
+        $document->load(['employee', 'documentType', 'uploader']);
+        $document->formatted_size = DocumentHelper::appendFormattedSize($document);
 
-        $document = EmployeeDocument::where('employee_id', $employeeId)
-            ->where('id', $documentId)
-            ->with('uploader:id,name,email')
-            ->firstOrFail();
-
-        $document->formatted_size = $document->formatted_size;
-        $document->document_type_label = EmployeeDocument::documentTypes()[$document->document_type] ?? $document->document_type;
-
-        return $this->success(['document' => $document], 'Document retrieved successfully.');
+        return $this->success([
+            'document' => $document
+        ], 'Document retrieved successfully.');
     }
 
-    public function download($employeeId, $documentId)
+    public function download(EmployeeDocument $document)
     {
-        $employee = Employee::findOrFail($employeeId);
-
-        $document = EmployeeDocument::where('employee_id', $employeeId)
-            ->where('id', $documentId)
-            ->firstOrFail();
-
         if (!Storage::disk('private')->exists($document->file_path)) {
             abort(404, 'The document file was not found.');
         }
@@ -198,12 +205,5 @@ class DocumentController extends Controller
             $document->file_name,
             ['Content-Type' => $document->mime_type]
         );
-    }
-
-    private function generateUniqueFileName($file): string
-    {
-        $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-        $extension = $file->getClientOriginalExtension();
-        return "{$originalName}_" . Str::uuid() . ".{$extension}";
     }
 }

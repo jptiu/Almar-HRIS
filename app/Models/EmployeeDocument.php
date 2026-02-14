@@ -7,18 +7,31 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class EmployeeDocument extends Model
 {
+    // Fillable fields for mass assignment
     protected $fillable = [
         'employee_id',
-        'document_type',
+        'document_type_id',
         'file_name',
         'file_path',
         'file_size',
         'mime_type',
         'description',
+        'uploaded_by',
     ];
 
+    // Casts for proper data types
     protected $casts = [
         'file_size' => 'integer',
+        'uploaded_by' => 'integer', // optional, for safety
+    ];
+
+    // Protected searchable fields for global search
+    protected $searchable = [
+        'file_name',
+        'description',
+        'employee.first_name',
+        'employee.last_name',
+        'documentType.name',
     ];
 
     /**
@@ -42,7 +55,7 @@ class EmployeeDocument extends Model
      */
     public function documentType(): BelongsTo
     {
-        return $this->belongsTo(DocumentType::class, 'document_type', 'slug');
+        return $this->belongsTo(DocumentType::class);
     }
 
     /**
@@ -81,17 +94,4 @@ class EmployeeDocument extends Model
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         ];
     }
-
-    /**
-     * Get document types for employees.
-     * Fetches from database.
-     */
-    public static function documentTypes(): array
-    {
-        return DocumentType::where('is_active', true)
-            ->orderBy('sort_order')
-            ->pluck('name', 'slug')
-            ->toArray();
-    }
 }
-

@@ -25,7 +25,7 @@ class DocumentType extends Model
      */
     public function documents(): HasMany
     {
-        return $this->hasMany(EmployeeDocument::class, 'document_type', 'slug');
+        return $this->hasMany(EmployeeDocument::class);
     }
 }
 

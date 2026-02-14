@@ -28,4 +28,12 @@ class Department extends Model
     {
         return $this->hasMany(Position::class);
     }
+
+    /**
+     * Get the employees in this department.
+     */
+    public function employees()
+    {
+        return $this->hasMany(Employee::class);
+    }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Models\EmployeeDocument;
+use App\Models\DocumentType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -26,11 +26,10 @@ class DocumentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'document_type' => [
+            'document_type_id' => [
                 'required',
-                'string',
-                'max:50',
-                Rule::in(array_keys(EmployeeDocument::documentTypes())),
+                'integer',
+                Rule::exists('document_types', 'id'),
             ],
             'file' => [
                 'required',
@@ -50,9 +49,9 @@ class DocumentRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'document_type.required' => 'The document type is required.',
-            'document_type.max' => 'The document type cannot exceed 50 characters.',
-            'document_type.in' => 'The selected document type is invalid.',
+            'document_type_id.required' => 'The document type is required.',
+            'document_type_id.integer' => 'The document type must be a valid ID.',
+            'document_type_id.exists' => 'The selected document type is invalid.',
             'file.required' => 'Please upload a file.',
             'file.file' => 'The uploaded file is invalid.',
             'file.max' => 'The file size cannot exceed 10MB.',
@@ -66,7 +65,14 @@ class DocumentRequest extends FormRequest
      */
     public function allowedMimeTypes(): array
     {
-        return EmployeeDocument::allowedMimeTypes();
+        return [
+            'application/pdf',
+            'image/jpeg',
+            'image/png',
+            'image/jpg',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        ];
     }
 }
 
