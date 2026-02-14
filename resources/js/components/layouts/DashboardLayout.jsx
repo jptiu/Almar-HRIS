@@ -71,7 +71,7 @@ const DashboardLayout = ({ children }) => {
                 } min-h-screen`}
             >
                 <Topbar />
-                <div className="p-8 bg-brand-primary-light min-h-[calc(100vh-80px)] mt-10">
+                <div className="p-8 bg-[#e6ebf3] min-h-[calc(100vh-80px)] mt-10">
                     <Outlet />
                 </div>
             </main>

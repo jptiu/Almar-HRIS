@@ -35,7 +35,6 @@ export default function LoginForm() {
                 case "admin":
                     navigate("/admin/dashboard", { replace: true });
                     break;
-                case "hr":
                 case "manager":
                     navigate("/hr/dashboard", { replace: true });
                     break;

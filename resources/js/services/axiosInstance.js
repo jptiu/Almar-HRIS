@@ -21,7 +21,6 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error("API Error:", error);
     if (error.response?.status === 401) {
       useAuthStore.getState().logout();
     }

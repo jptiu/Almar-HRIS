@@ -24,12 +24,7 @@ const NotFound = () => {
 
         {/* Actions */}
         <div className="space-y-3">
-          <Button variant="primary" className="w-full" onClick={() => navigate("/")}>
-            Go Home
-            <ArrowRight className="w-4 h-4" />
-          </Button>
-
-          <Button variant="ghost" className="w-full" onClick={() => navigate(-1)}>
+          <Button variant="ghost" className="w-full" onClick={() => navigate("/")}>
             Go Back
           </Button>
         </div>

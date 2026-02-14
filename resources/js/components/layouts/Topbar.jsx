@@ -34,7 +34,7 @@ const Topbar = () => {
 
     return (
         <header
-            className="fixed top-0 right-0 h-16 z-30 transition-all duration-30 bg-brand-primary-light/20 backdrop-blur-md border-b border-gray-200"
+            className="fixed top-0 right-0 h-16 z-30 transition-all duration-30 bg-[brand-primary-light/20] backdrop-blur-md border-b border-gray-200"
             style={{ left: isMobile ? 0 : sidebarCollapsed ? "5rem" : "16rem" }}
         >
             <div className="flex items-center justify-between h-full px-8">

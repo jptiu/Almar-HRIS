@@ -58,7 +58,7 @@ function App() {
                             <Route
                                 element={
                                     <RoleBasedRoute
-                                        allowedRoles={["hr", "manager"]}
+                                        allowedRoles={["manager"]}
                                     />
                                 }
                             >

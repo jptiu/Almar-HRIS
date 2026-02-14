@@ -2,7 +2,7 @@
 import { cn } from "@/utils";
 
 const variantStyles = {
-    default: "border border-gray-200",
+    default: "bg-white border border-gray-200",
     success: "bg-success/10 border border-success/20",
     warning: "bg-warning/10 border border-warning/20",
     info: "bg-info/10 border border-info/20",

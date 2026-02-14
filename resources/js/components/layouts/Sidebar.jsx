@@ -24,7 +24,7 @@ const Sidebar = () => {
     const isCollapsedDesktop = sidebarCollapsed && !isMobile && !mobileMenuOpen;
 
     const sidebarClasses = cn(
-        "fixed left-0 top-0 h-screen bg-[#0f1629] transition-all duration-300 z-40 flex flex-col",
+        "fixed left-0 top-0 h-screen bg-[#eff2f7] transition-all duration-300 z-40 flex flex-col",
         {
             "w-64": !sidebarCollapsed || mobileMenuOpen,
             "w-20": sidebarCollapsed && !mobileMenuOpen,
@@ -36,7 +36,7 @@ const Sidebar = () => {
     return (
         <div className={sidebarClasses}>
             {/* Logo */}
-            <div className="border-b border-white/10 flex items-center justify-center bg-white p-2 sticky top-0 z-10">
+            <div className="border-b border-white/10 flex items-center justify-center bg-[#eff2f7] p-2 sticky top-0 z-10">
                 {sidebarCollapsed && !mobileMenuOpen ? (
                     <img
                         src="/images/almar-main-logo.svg"
@@ -69,7 +69,7 @@ const Sidebar = () => {
                             onClick={handleNavClick}
                             className={({ isActive }) =>
                                 cn(
-                                    "group relative rounded-xl transition-all duration-200 overflow-hidden shrink-0",
+                                    "group relative rounded-xl transition-all duration-200 overflow-hidden shrink-0 text-extr",
                                     isCollapsedDesktop
                                         ? "flex flex-col items-center justify-center gap-1 p-3"
                                         : sidebarCollapsed
@@ -78,7 +78,7 @@ const Sidebar = () => {
                                     {
                                         "bg-brand-primary text-white shadow-lg":
                                             isActive,
-                                        "text-gray-400 hover:bg-white/5 hover:text-white":
+                                        "text-text-dark hover:bg-white":
                                             !isActive,
                                     },
                                 )
@@ -170,7 +170,7 @@ const Sidebar = () => {
 
                 <button
                     className={cn(
-                        "w-full rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 transition-colors mt-2 cursor-pointer",
+                        "w-full rounded-2xl text-gray-400 hover:text-danger hover:bg-white/5 transition-colors mt-2 cursor-pointer",
                         sidebarCollapsed
                             ? "flex justify-center p-3"
                             : "flex items-center gap-3 px-4 py-3",
