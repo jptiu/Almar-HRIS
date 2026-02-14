@@ -6,6 +6,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -19,10 +20,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(prepend: [
             \Illuminate\Http\Middleware\HandleCors::class,
             \Illuminate\Session\Middleware\StartSession::class,
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            \Illuminate\Cookie\Middleware\EncryptCookies::class,
         ]);
 
         $middleware->alias([
-            'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
+            'auth.session' => \Illuminate\Session\Middleware\AuthenticateSession::class,
             'role' => \App\Http\Middleware\CheckRole::class,
         ]);
     })
@@ -92,7 +95,7 @@ return Application::configure(basePath: dirname(__DIR__))
             /**
              * Default server error (500)
              */
-            \Log::error($e);
+            Log::error($e);
 
             if (app()->isLocal()) {
                 return response()->json([
