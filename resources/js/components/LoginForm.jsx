@@ -1,59 +1,17 @@
 import React, { useState } from "react";
 import { Mail, Eye, EyeOff } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 import InputField from "./ui/InputField";
-import { loginApi } from "@/services/authService";
-import { useAuthStore } from "@/stores/authStore";
+import { useLoginMutation } from "./hooks";
 
 export default function LoginForm() {
-    const navigate = useNavigate();
-    const setUser = useAuthStore((state) => state.setUser);
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
 
-    const { mutate, isPending } = useMutation({
-        mutationFn: loginApi,
-
-        onSuccess: (response) => {
-            if (!response.success) {
-                toast.error(response.message || "Login failed");
-                return;
-            }
-
-            const userData = response.data;
-            setUser(userData);
-
-            toast.success("Login successful");
-
-            const userRole = userData.roles?.[0] ?? null;
-            switch (userRole) {
-                case "admin":
-                    navigate("/admin/dashboard", { replace: true });
-                    break;
-                case "manager":
-                    navigate("/hr/dashboard", { replace: true });
-                    break;
-                case "employee":
-                    navigate("/employee/dashboard", { replace: true });
-                    break;
-                default:
-                    navigate("/employee/dashboard", { replace: true });
-                    break;
-            }
-        },
-
-        onError: (error) => {
-            console.error("Login error:", error); // Debugging line
-            const message =
-                error?.response?.data?.message || "Something went wrong";
-            toast.error(message);
-        },
-    });
+    const { mutate, isPending } = useLoginMutation();
 
     const handleSubmit = (e) => {
         e.preventDefault();

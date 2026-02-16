@@ -1,8 +1,7 @@
 // resources/js/ui/Modal.jsx
 import { useEffect } from "react";
 import { X } from "lucide-react";
-import { cn } from "../../utils/cn";
-import { Button } from "./Button";
+import { cn } from "@/lib/utils";
 
 const Modal = ({
     isOpen,
@@ -24,15 +23,8 @@ const Modal = ({
     }, [isOpen, onClose]);
 
     useEffect(() => {
-        if (isOpen) {
-            document.body.style.overflow = "hidden";
-        } else {
-            document.body.style.overflow = "unset";
-        }
-
-        return () => {
-            document.body.style.overflow = "unset";
-        };
+        document.body.style.overflow = isOpen ? "hidden" : "unset";
+        return () => (document.body.style.overflow = "unset");
     }, [isOpen]);
 
     if (!isOpen) return null;
@@ -46,56 +38,47 @@ const Modal = ({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            {/* Backdrop */}
-            <div
-                className="absolute inset-0 bg-(--color-surface-overlay) backdrop-blur-xs"
-                onClick={onClose}
-            />
+            {/* Backdrop - NO BLUR */}
+            <div className="absolute inset-0 bg-black/40" onClick={onClose} />
 
             {/* Modal */}
             <div
                 className={cn(
-                    "relative w-full glass-container rounded-lg shadow-[0_20px_60px_var(--color-shadow-elevation)] animate-in fade-in zoom-in duration-200",
+                    "relative w-full bg-white rounded-xl shadow-xl animate-in fade-in zoom-in duration-200",
                     sizes[size],
                 )}
             >
-                {/* Header */}
                 {(title || showCloseButton) && (
-                    <div className="flex items-center justify-between p-6 border-b border-(--color-border-default)">
+                    <div className="flex items-center justify-between p-6 border-b">
                         {title && (
-                            <h2 className="text-2xl font-semibold text-text-primary">
-                                {title}
-                            </h2>
+                            <h2 className="text-2xl font-semibold">{title}</h2>
                         )}
                         {showCloseButton && (
                             <button
                                 onClick={onClose}
-                                className="ml-auto p-2 hover:bg-(--color-brand-primary-100) rounded-lg transition-colors"
+                                className="ml-auto p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
                             >
-                                <X className="w-5 h-5 text-text-primary" />
+                                <X className="w-5 h-5" />
                             </button>
                         )}
                     </div>
                 )}
 
-                {/* Content */}
                 <div className="p-6">{children}</div>
             </div>
         </div>
     );
 };
 
-export const ModalFooter = ({ children, className = "" }) => {
-    return (
-        <div
-            className={cn(
-                "flex items-center justify-end gap-3 pt-4 border-t border-(--color-border-default)",
-                className,
-            )}
-        >
-            {children}
-        </div>
-    );
-};
+export const ModalFooter = ({ children, className = "" }) => (
+    <div
+        className={cn(
+            "flex items-center justify-end gap-3 pt-4",
+            className,
+        )}
+    >
+        {children}
+    </div>
+);
 
 export default Modal;

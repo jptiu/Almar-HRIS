@@ -1,5 +1,3 @@
-// resources/js/pages/hr/Dashboard.jsx
-import { useState, useEffect } from "react";
 import { useAuthStore } from "@/stores";
 import { useGreeting } from "../../../../hooks/useGreeting";
 import { Users, UserCheck, CalendarOff, TrendingUp } from "lucide-react";
@@ -23,7 +21,7 @@ export const Dashboard = () => {
             {/* Welcome Header */}
             <div>
                 <h1 className="text-2xl font-bold text-text-dark mb-2">
-                    {greeting}, {user?.full_name || "admin"}!
+                    {greeting}, {user?.user?.full_name || "user"}!
                 </h1>
                 <p className="text-text-tertiary">
                     Here's what's happening with your company today.
