@@ -5,7 +5,6 @@ import { Toaster } from "react-hot-toast";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import Home from "./pages/Home";
-import TestLogin from "./pages/TestLogin";
 import NotFound from "./pages/NotFound";
 
 import {
@@ -34,7 +33,6 @@ function App() {
                     <Routes>
                         {/* Public */}
                         <Route path="/" element={<Home />} />
-                        <Route path="/test-login" element={<TestLogin />} />
 
                         {/* Protected Sections */}
                         <Route element={<ProtectedRoutes />}>

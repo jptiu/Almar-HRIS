@@ -1,12 +1,10 @@
 import { create } from "zustand";
 import axiosInstance from "@/services/axiosInstance";
-import { switchRoleApi } from "@/services/authService";
 
 export const useAuthStore = create((set, get) => ({
   user: null,
   isLoading: true,
   isAuthenticated: false,
-  isSwitchingRole: false,
 
   setUser: (userData) => {
     if (!userData) return;
@@ -46,30 +44,6 @@ export const useAuthStore = create((set, get) => ({
         isAuthenticated: false,
         isLoading: false,
       });
-    }
-  },
-
-  // ------------------------
-  // SWITCH ROLE
-  // ------------------------
-  switchRole: async (role) => {
-    try {
-      set({ isSwitchingRole: true });
-      const response = await switchRoleApi(role);
-      const newActiveRole = response.data?.active_role;
-
-      set((state) => ({
-        user: {
-          ...state.user,
-          active_role: newActiveRole,
-        },
-        isSwitchingRole: false,
-      }));
-
-      return newActiveRole;
-    } catch (error) {
-      set({ isSwitchingRole: false });
-      throw error;
     }
   },
 
