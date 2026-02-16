@@ -67,7 +67,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/employee-statuses', [EmployeeStatusController::class, 'index']);
     Route::get('/position-levels', [PositionLevelController::class, 'index']);
     Route::get('/leave-types', [LeaveTypeController::class, 'index']);
-
+    Route::get('/dashboard/birthdays', [DashboardController::class, 'birthdays']);
     /*
     |--------------------------------------------------------------------------
     | Admin & Manager Area
@@ -187,5 +187,5 @@ Route::middleware('auth')->group(function () {
             Route::get('/leave-credits', [LeaveController::class, 'employeeLeaveCredits']);
             Route::patch('/leave-credits', [LeaveController::class, 'adjustLeaveCredits']);
         });
-    });  
+    });
 });

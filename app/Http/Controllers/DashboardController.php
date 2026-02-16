@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\BirthdayResource;
 use App\Models\Employee;
 use App\Models\EmployeeStatus;
 use App\Models\Department;
 use App\Models\Branch;
 use App\Models\Position;
 use App\Models\Company;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -190,13 +192,13 @@ class DashboardController extends Controller
     {
         $hiringTrends = [];
         $currentDate = now();
-        
+
         for ($i = 11; $i >= 0; $i--) {
             $monthStart = $currentDate->copy()->subMonths($i)->startOfMonth();
             $monthEnd = $currentDate->copy()->subMonths($i)->endOfMonth();
-            
+
             $count = Employee::whereBetween('hire_date', [$monthStart, $monthEnd])->count();
-            
+
             $hiringTrends[] = [
                 'month' => $monthStart->format('Y-m'),
                 'month_name' => $monthStart->format('F Y'),
@@ -226,7 +228,7 @@ class DashboardController extends Controller
             ->get()
             ->map(function ($department) {
                 $salaries = $department->employees->whereNotNull('base_salary');
-                
+
                 return [
                     'id' => $department->id,
                     'name' => $department->name,
@@ -252,7 +254,7 @@ class DashboardController extends Controller
     {
         // Stats
         $totalEmployees = Employee::count();
-        
+
         // By status
         $statuses = EmployeeStatus::withCount('employees')->get();
         $total = $statuses->sum('employees_count');
@@ -284,13 +286,13 @@ class DashboardController extends Controller
         // Hiring trends (last 6 months)
         $hiringTrends = [];
         $currentDate = now();
-        
+
         for ($i = 5; $i >= 0; $i--) {
             $monthStart = $currentDate->copy()->subMonths($i)->startOfMonth();
             $monthEnd = $currentDate->copy()->subMonths($i)->endOfMonth();
-            
+
             $count = Employee::whereBetween('hire_date', [$monthStart, $monthEnd])->count();
-            
+
             $hiringTrends[] = [
                 'month' => $monthStart->format('Y-m'),
                 'month_name' => $monthStart->format('M Y'),
@@ -323,5 +325,53 @@ class DashboardController extends Controller
             ],
         ], 'Dashboard overview retrieved successfully');
     }
-}
 
+    /**
+     * Dashboard - Employee Birthdays
+     */
+
+    public function birthdays(): JsonResponse
+    {
+        $today = Carbon::today();
+        $todayMonthDay = $today->format('m-d');
+
+        // Prepare next 7 days month-day strings
+        $upcomingDates = collect();
+        for ($i = 1; $i <= 7; $i++) {
+            $upcomingDates->push($today->copy()->addDays($i)->format('m-d'));
+        }
+
+        // Combine today + upcoming
+        $allDates = $upcomingDates->prepend($todayMonthDay);
+
+        // Fetch employees whose users are active
+        $employees = Employee::whereHas('user', fn($q) => $q->where('is_active', true))
+            ->whereNotNull('birthdate')
+            ->where(function ($query) use ($allDates) {
+                foreach ($allDates as $date) {
+                    $query->orWhereRaw('DATE_FORMAT(birthdate, "%m-%d") = ?', [$date]);
+                }
+            })
+            ->with(['position', 'department', 'branch', 'company', 'user'])
+            ->get();
+
+        // Split today vs upcoming
+        $birthdaysToday = $employees->filter(
+            fn($e) =>
+            Carbon::parse($e->birthdate)->format('m-d') === $todayMonthDay
+        )->values();
+
+        $upcomingBirthdays = $employees->filter(
+            fn($e) =>
+            Carbon::parse($e->birthdate)->format('m-d') !== $todayMonthDay
+        )
+            ->sortBy(fn($e) => Carbon::parse($e->birthdate)->format('m-d'))
+            ->values();
+
+        return $this->success([
+            'today' => BirthdayResource::collection($birthdaysToday),
+            'upcoming' => BirthdayResource::collection($upcomingBirthdays),
+            'total_upcoming' => $upcomingBirthdays->count(),
+        ], 'Birthdays retrieved successfully');
+    }
+}

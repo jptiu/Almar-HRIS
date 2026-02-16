@@ -10,26 +10,24 @@ use App\Models\EmployeeStatus;
 use App\Models\Position;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Carbon\Carbon;
 
 class EmployeeSeeder extends Seeder
 {
     use WithoutModelEvents;
 
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Get common data
         $company = Company::first();
         $branch = Branch::first();
+
         $hrDepartment = Department::where('name', 'Human Resources')->first();
         $itDepartment = Department::where('name', 'Information Technology')->first();
         $financeDepartment = Department::where('name', 'Finance')->first();
+
         $permanentStatus = EmployeeStatus::where('name', 'permanent')->first();
         $probationaryStatus = EmployeeStatus::where('name', 'probationary')->first();
 
-        // Get positions
         $hrManagerPosition = Position::where('title', 'HR Manager')->first();
         $itManagerPosition = Position::where('title', 'IT Manager')->first();
         $financeManagerPosition = Position::where('title', 'Finance Manager')->first();
@@ -37,14 +35,13 @@ class EmployeeSeeder extends Seeder
         $developerPosition = Position::where('title', 'Software Developer')->first();
         $accountantPosition = Position::where('title', 'Senior Accountant')->first();
 
-        // Create HR Manager employee (for user_id 2)
-        Employee::updateOrCreate(
-            ['user_id' => 2],
+        $currentMonth = now()->month;
+        $startDay = now()->day;
+
+        $employees = [
             [
                 'user_id' => 2,
                 'created_by' => 1,
-                'company_id' => $company?->id,
-                'branch_id' => $branch?->id,
                 'position_id' => $hrManagerPosition?->id,
                 'department_id' => $hrDepartment?->id,
                 'manager_id' => null,
@@ -60,19 +57,12 @@ class EmployeeSeeder extends Seeder
                 'country' => 'Philippines',
                 'phone' => '+63 912 345 6701',
                 'hire_date' => now()->subMonths(12),
-                'birthdate' => '1985-06-15',
+                'birthdate' => Carbon::createFromDate(1985, $currentMonth, $startDay),
                 'base_salary' => 85000.00,
-            ]
-        );
-
-        // Create IT Manager employee
-        $itManager = Employee::updateOrCreate(
-            ['user_id' => 3],
+            ],
             [
                 'user_id' => 3,
                 'created_by' => 1,
-                'company_id' => $company?->id,
-                'branch_id' => $branch?->id,
                 'position_id' => $itManagerPosition?->id,
                 'department_id' => $itDepartment?->id,
                 'manager_id' => null,
@@ -88,19 +78,12 @@ class EmployeeSeeder extends Seeder
                 'country' => 'Philippines',
                 'phone' => '+63 912 345 6702',
                 'hire_date' => now()->subMonths(10),
-                'birthdate' => '1988-03-22',
+                'birthdate' => Carbon::createFromDate(1988, $currentMonth, $startDay + 1),
                 'base_salary' => 95000.00,
-            ]
-        );
-
-        // Create Finance Manager employee
-        Employee::updateOrCreate(
-            ['user_id' => 4],
+            ],
             [
                 'user_id' => 4,
                 'created_by' => 1,
-                'company_id' => $company?->id,
-                'branch_id' => $branch?->id,
                 'position_id' => $financeManagerPosition?->id,
                 'department_id' => $financeDepartment?->id,
                 'manager_id' => null,
@@ -116,22 +99,15 @@ class EmployeeSeeder extends Seeder
                 'country' => 'Philippines',
                 'phone' => '+63 912 345 6703',
                 'hire_date' => now()->subMonths(8),
-                'birthdate' => '1982-11-08',
+                'birthdate' => Carbon::createFromDate(1982, $currentMonth, $startDay + 2),
                 'base_salary' => 90000.00,
-            ]
-        );
-
-        // Create HR Officer employee (reporting to HR Manager)
-        Employee::updateOrCreate(
-            ['user_id' => 5],
+            ],
             [
                 'user_id' => 5,
                 'created_by' => 2,
-                'company_id' => $company?->id,
-                'branch_id' => $branch?->id,
                 'position_id' => $hrOfficerPosition?->id,
                 'department_id' => $hrDepartment?->id,
-                'manager_id' => 2, // Reports to HR Manager
+                'manager_id' => 2,
                 'employee_status_id' => $permanentStatus?->id,
                 'first_name' => 'Emily',
                 'middle_name' => 'Rose',
@@ -144,22 +120,15 @@ class EmployeeSeeder extends Seeder
                 'country' => 'Philippines',
                 'phone' => '+63 912 345 6704',
                 'hire_date' => now()->subMonths(6),
-                'birthdate' => '1992-07-19',
+                'birthdate' => Carbon::createFromDate(1992, $currentMonth, $startDay + 3),
                 'base_salary' => 45000.00,
-            ]
-        );
-
-        // Create Software Developer employee (reporting to IT Manager)
-        Employee::updateOrCreate(
-            ['user_id' => 6],
+            ],
             [
                 'user_id' => 6,
                 'created_by' => 3,
-                'company_id' => $company?->id,
-                'branch_id' => $branch?->id,
                 'position_id' => $developerPosition?->id,
                 'department_id' => $itDepartment?->id,
-                'manager_id' => $itManager?->id,
+                'manager_id' => 3,
                 'employee_status_id' => $probationaryStatus?->id,
                 'first_name' => 'Michael',
                 'middle_name' => 'James',
@@ -172,22 +141,15 @@ class EmployeeSeeder extends Seeder
                 'country' => 'Philippines',
                 'phone' => '+63 912 345 6705',
                 'hire_date' => now()->subMonths(2),
-                'birthdate' => '1995-01-30',
+                'birthdate' => Carbon::createFromDate(1995, $currentMonth, $startDay + 4),
                 'base_salary' => 55000.00,
-            ]
-        );
-
-        // Create Senior Accountant employee (reporting to Finance Manager)
-        Employee::updateOrCreate(
-            ['user_id' => 7],
+            ],
             [
                 'user_id' => 7,
                 'created_by' => 4,
-                'company_id' => $company?->id,
-                'branch_id' => $branch?->id,
                 'position_id' => $accountantPosition?->id,
                 'department_id' => $financeDepartment?->id,
-                'manager_id' => null, // Reports to Finance Manager (will need update)
+                'manager_id' => null,
                 'employee_status_id' => $permanentStatus?->id,
                 'first_name' => 'Jennifer',
                 'middle_name' => 'Ann',
@@ -200,10 +162,19 @@ class EmployeeSeeder extends Seeder
                 'country' => 'Philippines',
                 'phone' => '+63 912 345 6706',
                 'hire_date' => now()->subMonths(4),
-                'birthdate' => '1990-09-14',
+                'birthdate' => Carbon::createFromDate(1990, $currentMonth, $startDay + 5),
                 'base_salary' => 65000.00,
-            ]
-        );
+            ],
+        ];
+
+        foreach ($employees as $data) {
+            Employee::updateOrCreate(
+                ['user_id' => $data['user_id']],
+                array_merge($data, [
+                    'company_id' => $company?->id,
+                    'branch_id' => $branch?->id,
+                ])
+            );
+        }
     }
 }
-
