@@ -8,7 +8,12 @@ import Home from "./pages/Home";
 import TestLogin from "./pages/TestLogin";
 import NotFound from "./pages/NotFound";
 
-import { hrRoutes, ProtectedRoutes, adminRoutes, employeeRoutes } from "./routes";
+import {
+    hrRoutes,
+    ProtectedRoutes,
+    adminRoutes,
+    employeeRoutes,
+} from "./routes";
 import AppLoader from "./components/AppLoader";
 import RoleBasedRoute from "./components/layouts/RoleBasedRoute";
 import DashboardLayout from "./components/layouts/DashboardLayout";
@@ -25,7 +30,6 @@ function App() {
                         duration: 3000,
                     }}
                 />
-                {/* Wrap routes in AppLoader to restore session */}
                 <AppLoader>
                     <Routes>
                         {/* Public */}

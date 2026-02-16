@@ -1,25 +1,57 @@
 // resources/js/layouts/Sidebar.jsx
-import { NavLink } from "react-router-dom";
+import { useEffect, useCallback } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuthStore, useUIStore } from "@/stores";
 import { navigationConfig } from "../../config/navigationConfig";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { cn } from "../../utils/cn";
-import { User, LogOut } from "lucide-react";
+import SidebarProfileFooter from "./SidebarProfileFooter";
 
-const Sidebar = () => {
+const Sidebar = ({ onLogout }) => {
     const sidebarCollapsed = useUIStore((state) => state.sidebarCollapsed);
     const mobileMenuOpen = useUIStore((state) => state.mobileMenuOpen);
     const closeMobileMenu = useUIStore((state) => state.closeMobileMenu);
 
-    const role = useAuthStore((state) => state.user?.primaryRole) || "employee";
+    const role = useAuthStore((state) => state.user?.active_role) || "employee";
     const user = useAuthStore((state) => state.user);
+    const switchRole = useAuthStore((state) => state.switchRole);
+    const isSwitchingRole = useAuthStore((state) => state.isSwitchingRole);
+    const navigate = useNavigate();
     const isMobile = useMediaQuery("(max-width: 768px)");
 
     const navItems = navigationConfig[role] || [];
 
+    useEffect(() => {
+        if (!isMobile && mobileMenuOpen) {
+            closeMobileMenu();
+        }
+    }, [isMobile, mobileMenuOpen, closeMobileMenu]);
+
     const handleNavClick = () => {
         if (isMobile) closeMobileMenu();
     };
+
+    const getRoleDashboardPath = (roleName) => {
+        const roleRouteMap = {
+            admin: "/admin/dashboard",
+            manager: "/hr/dashboard",
+            employee: "/employee/dashboard",
+        };
+        return roleRouteMap[roleName] || "/employee/dashboard";
+    };
+
+    const handleSwitchRole = useCallback(
+        async (newRole) => {
+            if (newRole === role) return;
+            try {
+                const activeRole = await switchRole(newRole);
+                navigate(getRoleDashboardPath(activeRole));
+            } catch (error) {
+                console.error("Failed to switch role:", error);
+            }
+        },
+        [role, switchRole, navigate],
+    );
 
     const isCollapsedDesktop = sidebarCollapsed && !isMobile && !mobileMenuOpen;
 
@@ -105,7 +137,6 @@ const Sidebar = () => {
                                 </span>
                             )}
 
-                            {/* Badge (expanded only) */}
                             {item.badge &&
                                 (!sidebarCollapsed || mobileMenuOpen) && (
                                     <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5 font-semibold">
@@ -133,56 +164,14 @@ const Sidebar = () => {
             </nav>
 
             {/* User Section */}
-            <div
-                className={cn(
-                    "border-t border-white/10 bg-[#0f1629] sticky bottom-0 z-10",
-                    sidebarCollapsed ? "p-2" : "p-4",
-                )}
-            >
-                <div
-                    className={cn(
-                        "rounded-2xl hover:bg-white/5 transition-colors cursor-pointer",
-                        sidebarCollapsed
-                            ? "flex justify-center p-2"
-                            : "flex items-center gap-3 p-3",
-                    )}
-                >
-                    <div
-                        className={cn(
-                            "bg-teal-500 rounded-full flex items-center justify-center text-white font-semibold shrink-0",
-                            sidebarCollapsed ? "w-12 h-12" : "w-10 h-10",
-                        )}
-                    >
-                        <User className="h-4 w-4" />
-                    </div>
-
-                    {(!sidebarCollapsed || mobileMenuOpen) && (
-                        <div className="flex-1 min-w-0">
-                            <p className="text-white text-sm font-medium truncate">
-                                {user?.full_name || user?.name || "Admin"}
-                            </p>
-                            <p className="text-gray-400 text-xs truncate">
-                                {user?.position || user?.primaryRole || "Employee"}
-                            </p>
-                        </div>
-                    )}
-                </div>
-
-                <button
-                    className={cn(
-                        "w-full rounded-2xl text-gray-400 hover:text-danger hover:bg-white/5 transition-colors mt-2 cursor-pointer",
-                        sidebarCollapsed
-                            ? "flex justify-center p-3"
-                            : "flex items-center gap-3 px-4 py-3",
-                    )}
-                >
-                    <LogOut className="w-5 h-5 shrink-0" />
-
-                    {(!sidebarCollapsed || mobileMenuOpen) && (
-                        <span className="text-sm font-medium">Sign Out</span>
-                    )}
-                </button>
-            </div>
+            <SidebarProfileFooter
+                user={user}
+                sidebarCollapsed={sidebarCollapsed}
+                mobileMenuOpen={mobileMenuOpen}
+                onSwitchRole={handleSwitchRole}
+                isSwitchingRole={isSwitchingRole}
+                onLogout={onLogout}
+            />
         </div>
     );
 };

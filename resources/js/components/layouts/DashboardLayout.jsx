@@ -1,14 +1,16 @@
 // resources/js/layouts/DashboardLayout.jsx
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { useUIStore } from "@/stores";
 import Topbar from "./Topbar";
 import Sidebar from "./Sidebar";
+import LogoutConfirmModal from "./LogoutConfirmModal";
+import { useLogoutMutation } from "../hooks/useLogoutMutation";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "../../utils/cn";
 
-const DashboardLayout = ({ children }) => {
+const DashboardLayout = () => {
     const sidebarCollapsed = useUIStore((state) => state.sidebarCollapsed);
     const mobileMenuOpen = useUIStore((state) => state.mobileMenuOpen);
     const closeMobileMenu = useUIStore((state) => state.closeMobileMenu);
@@ -17,19 +19,24 @@ const DashboardLayout = ({ children }) => {
 
     const isMobile = useMediaQuery("(max-width: 768px)");
 
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const logoutMutation = useLogoutMutation({
+        onSuccess: () => setShowLogoutModal(false),
+    });
+
     useEffect(() => {
         document.documentElement.classList.toggle("dark", theme === "dark");
     }, [theme]);
 
     const handleOverlayClick = () => {
-        if (isMobile && mobileMenuOpen) {
-            closeMobileMenu();
-        }
+        if (isMobile && mobileMenuOpen) closeMobileMenu();
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <Sidebar />
+        <div className="h-screen flex overflow-hidden bg-[#e6ebf3]">
+            {/* Sidebar */}
+            <Sidebar onLogout={() => setShowLogoutModal(true)} />
+
             {/* Floating sidebar toggle */}
             {!isMobile && (
                 <button
@@ -37,17 +44,16 @@ const DashboardLayout = ({ children }) => {
                     aria-label="Toggle sidebar"
                     className={cn(
                         "fixed top-31 z-50 group",
-                        "w-6 h-6 rounded-full bg-white text-white border border-gray-300",
+                        "w-6 h-6 rounded-full bg-brand-primary border border-gray-300",
                         "flex items-center justify-center shadow-xl",
                         "hover:scale-110 transition-all duration-300 cursor-pointer",
-
                         !sidebarCollapsed ? "left-61" : "left-17",
                     )}
                 >
                     {sidebarCollapsed ? (
-                        <ChevronRight className="w-4 h-4 text-gray-500" />
+                        <ChevronRight className="w-4 h-4 text-white" />
                     ) : (
-                        <ChevronLeft className="w-4 h-4 text-gray-500" />
+                        <ChevronLeft className="w-4 h-4 text-white" />
                     )}
                 </button>
             )}
@@ -60,21 +66,32 @@ const DashboardLayout = ({ children }) => {
                 />
             )}
 
-            {/* Main content */}
+            {/* Main area */}
             <main
-                className={`transition-all duration-300 ${
+                className={cn(
+                    "flex flex-col flex-1 overflow-hidden transition-all duration-300",
                     !isMobile && !sidebarCollapsed
                         ? "ml-64"
                         : !isMobile
                           ? "ml-20"
-                          : "ml-0"
-                } min-h-screen`}
+                          : "ml-0",
+                )}
             >
+                {/* Topbar fixed height */}
                 <Topbar />
-                <div className="p-8 bg-[#e6ebf3] min-h-[calc(100vh-80px)] mt-10">
+
+                {/* Scrollable page content */}
+                <div className="flex-1 overflow-y-auto p-8 mt-10">
                     <Outlet />
                 </div>
             </main>
+
+            <LogoutConfirmModal
+                isOpen={showLogoutModal}
+                onClose={() => setShowLogoutModal(false)}
+                onConfirm={() => logoutMutation.mutate()}
+                isLoading={logoutMutation.isPending}
+            />
         </div>
     );
 };

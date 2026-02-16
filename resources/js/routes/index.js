@@ -1,4 +1,4 @@
-export * from "./admin.routes";
-export * from "./employee.routes";
-export * from "./hr.routes";
+export * from "./adminRoutes";
+export * from "./employeeRoutes";
+export * from "./hrRoutes";
 export * from "./ProtectedRoutes";

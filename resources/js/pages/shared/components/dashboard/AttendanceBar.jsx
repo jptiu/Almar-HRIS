@@ -20,6 +20,7 @@ const chartData = [
   { month: "Wednesday", present: 237, absent: 120 },
   { month: "Thursday", present: 73, absent: 190 },
   { month: "Friday", present: 209, absent: 130 },
+  { month: "Saturday", present: 112, absent: 95 },
 ]
 
 const chartConfig = {

@@ -17,12 +17,12 @@ const axiosInstance = axios.create({
   },
 });
 
-// Optional: handle 401 globally
+// Handle 401 globally — use clearUser() (state-only) instead of logout()
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      useAuthStore.getState().logout();
+      useAuthStore.getState().clearUser();
     }
     return Promise.reject(error);
   }

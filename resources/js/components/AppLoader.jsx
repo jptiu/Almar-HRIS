@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAuthStore } from "@/stores/authStore";
+import { useAuthStore } from "@/stores";
 import { useLocation, useNavigate } from "react-router-dom";
 import LoadingSpinner from "./LoadingSpinner";
 
@@ -7,6 +7,7 @@ const AppLoader = ({ children }) => {
   const initializeAuth = useAuthStore((state) => state.initializeAuth);
   const isLoading = useAuthStore((state) => state.isLoading);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const userRole = useAuthStore((state) => state.user?.active_role);
   const user = useAuthStore((state) => state.user);
 
   const location = useLocation();
@@ -37,8 +38,8 @@ const AppLoader = ({ children }) => {
     if (!isAuthenticated) return;
 
     // Only redirect if user is at base domain "/"
-    if (location.pathname === "/") {
-      const role = user?.primaryRole;
+    if (location.pathname === "/" && isAuthenticated) {
+      const role = userRole;
 
       if (role === "admin") {
         navigate("/admin/dashboard", { replace: true });

@@ -1,10 +1,12 @@
 import { create } from "zustand";
 import axiosInstance from "@/services/axiosInstance";
+import { switchRoleApi } from "@/services/authService";
 
 export const useAuthStore = create((set, get) => ({
   user: null,
   isLoading: true,
   isAuthenticated: false,
+  isSwitchingRole: false,
 
   setUser: (userData) => {
     if (!userData) return;
@@ -12,7 +14,6 @@ export const useAuthStore = create((set, get) => ({
     set({
       user: {
         ...userData,
-        primaryRole: userData.roles?.[0] ?? null,
       },
       isAuthenticated: true,
       isLoading: false,
@@ -35,7 +36,6 @@ export const useAuthStore = create((set, get) => ({
       set({
         user: {
           ...userData,
-          primaryRole: userData.roles?.[0] ?? null,
         },
         isAuthenticated: true,
         isLoading: false,
@@ -50,6 +50,30 @@ export const useAuthStore = create((set, get) => ({
   },
 
   // ------------------------
+  // SWITCH ROLE
+  // ------------------------
+  switchRole: async (role) => {
+    try {
+      set({ isSwitchingRole: true });
+      const response = await switchRoleApi(role);
+      const newActiveRole = response.data?.active_role;
+
+      set((state) => ({
+        user: {
+          ...state.user,
+          active_role: newActiveRole,
+        },
+        isSwitchingRole: false,
+      }));
+
+      return newActiveRole;
+    } catch (error) {
+      set({ isSwitchingRole: false });
+      throw error;
+    }
+  },
+
+  // ------------------------
   // ROLE CHECK
   // ------------------------
   hasRole: (role) => {
@@ -60,9 +84,17 @@ export const useAuthStore = create((set, get) => ({
   // ------------------------
   // LOGOUT
   // ------------------------
+  clearUser: () => {
+    set({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+    });
+  },
+
   logout: async () => {
     try {
-      await axiosInstance.post("/logout");
+      await axiosInstance.post("/me/logout");
     } catch (e) { }
 
     set({
