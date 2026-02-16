@@ -22,7 +22,7 @@ class EmployeeController extends Controller
     public function index(Request $request): JsonResponse
     {
         $query = Employee::with([
-            'user.roles',                     // include roles for UserResource
+            'user.roles',
             'position.positionLevel',
             'department',
             'company',
@@ -30,10 +30,8 @@ class EmployeeController extends Controller
             'status'
         ]);
 
-        // 🔥 Apply model-level filters
         $employees = Employee::applyFilters($request, $query);
 
-        // Map employees to their users
         $users = $employees->map(fn($employee) => $employee->user);
 
         return $this->success([
@@ -63,6 +61,7 @@ class EmployeeController extends Controller
                 ->exists();
 
             $roleNames = ['employee'];
+
             if ($isAdmin && $request->boolean('is_manager')) {
                 $roleNames[] = 'manager';
             }
@@ -124,16 +123,16 @@ class EmployeeController extends Controller
     /**
      * Display the specified employee.
      */
-    public function show($employee): JsonResponse
+    public function show(Employee $employee): JsonResponse
     {
-        $employee = Employee::with([
+        $employee->load([
             'user.roles',
             'position.positionLevel',
             'department',
             'company',
             'branch',
             'status'
-        ])->findOrFail($employee);
+        ]);
 
         return $this->success([
             'employee' => new UserResource($employee->user)
@@ -143,12 +142,12 @@ class EmployeeController extends Controller
     /**
      * Update the specified employee.
      */
-    public function update(EmployeeRequest $request, $employee): JsonResponse
+    public function update(EmployeeRequest $request, Employee $employee): JsonResponse
     {
         try {
             DB::beginTransaction();
 
-            $employee = Employee::with('user.roles')->findOrFail($employee);
+            $employee->load('user.roles');
             $user = $employee->user;
 
             if ($request->filled('email')) {
@@ -156,10 +155,13 @@ class EmployeeController extends Controller
             }
 
             if ($request->filled('password')) {
-                $user->update(['password' => Hash::make($request->password)]);
+                $user->update([
+                    'password' => Hash::make($request->password)
+                ]);
             }
 
             if ($request->has('is_manager')) {
+
                 $isAdmin = $request->user()
                     ->roles()
                     ->where('name', 'admin')
@@ -167,6 +169,7 @@ class EmployeeController extends Controller
 
                 if ($isAdmin) {
                     $roleNames = ['employee'];
+
                     if ($request->boolean('is_manager')) {
                         $roleNames[] = 'manager';
                     }
@@ -224,13 +227,14 @@ class EmployeeController extends Controller
     /**
      * Remove the specified employee.
      */
-    public function destroy($employee): JsonResponse
+    public function destroy(Employee $employee): JsonResponse
     {
         try {
             DB::beginTransaction();
 
-            $employee = Employee::with('user')->findOrFail($employee);
-            $employee->user->delete();
+            $employee->load('user');
+
+            $employee->user->delete(); // cascades if FK is set properly
 
             DB::commit();
 
