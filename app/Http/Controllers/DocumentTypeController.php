@@ -29,11 +29,9 @@ class DocumentTypeController extends Controller
     /**
      * Display the specified document type.
      */
-    public function show($id): JsonResponse
+    public function show(DocumentType $documentType): JsonResponse
     {
-        $documentType = DocumentType::findOrFail($id);
-
+        // The $documentType is automatically injected by Laravel's route model binding
         return $this->success(['document_type' => $documentType], 'Document type retrieved successfully.');
     }
 }
-

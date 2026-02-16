@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Http\Requests\DepartmentRequest;
 use App\Models\Department;
 use Illuminate\Http\JsonResponse;
@@ -10,62 +9,71 @@ use Illuminate\Http\JsonResponse;
 class DepartmentController extends Controller
 {
     /**
-     * Store a newly created department.
-     */
-    public function store(DepartmentRequest $request): JsonResponse
-    {
-        $department = Department::create([
-            'name' => $request->name,
-            'description' => $request->description,
-            'company_id' => $request->company_id,
-            'created_by' => $request->user()->id,
-        ]);
-
-        return $this->created(['department' => $department->load('company')], 'Department created successfully.');
-    }
-
-    /**
      * Display a listing of departments.
      */
     public function index(): JsonResponse
     {
         $departments = Department::with(['positions', 'creator', 'company'])->get();
-        return $this->success(['departments' => $departments], 'Departments retrieved successfully.');
+
+        return $this->success([
+            'departments' => $departments
+        ], 'Departments retrieved successfully.');
+    }
+
+    /**
+     * Store a newly created department.
+     */
+    public function store(DepartmentRequest $request): JsonResponse
+    {
+        $department = Department::create([
+            'name'       => $request->name,
+            'description'=> $request->description,
+            'company_id' => $request->company_id,
+            'created_by' => $request->user()->id,
+        ]);
+
+        $department->load('company');
+
+        return $this->created([
+            'department' => $department
+        ], 'Department created successfully.');
     }
 
     /**
      * Display the specified department.
      */
-    public function show($department): JsonResponse
+    public function show(Department $department): JsonResponse
     {
-        $department = Department::findOrFail($department);
         $department->load(['positions', 'creator', 'company']);
-        return $this->success(['department' => $department], 'Department retrieved successfully.');
+
+        return $this->success([
+            'department' => $department
+        ], 'Department retrieved successfully.');
     }
 
     /**
      * Update the specified department.
      */
-    public function update(DepartmentRequest $request, $department): JsonResponse
+    public function update(DepartmentRequest $request, Department $department): JsonResponse
     {
-        $department = Department::findOrFail($department);
         $department->update([
-            'name' => $request->name,
-            'description' => $request->description,
+            'name'       => $request->name,
+            'description'=> $request->description,
             'company_id' => $request->company_id,
         ]);
 
-        return $this->success(['department' => $department], 'Department updated successfully.');
+        return $this->success([
+            'department' => $department
+        ], 'Department updated successfully.');
     }
 
     /**
      * Remove the specified department.
      */
-    public function destroy($department): JsonResponse
+    public function destroy(Department $department): JsonResponse
     {
-        $department = Department::findOrFail($department);
         $department->delete();
+
         return $this->success(null, 'Department deleted successfully.');
     }
 }
-

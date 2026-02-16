@@ -16,6 +16,7 @@ class DocumentController extends Controller
     // ==========================
     // Employee Self-Service (/me)
     // ==========================
+
     public function myDocuments(Request $request)
     {
         $employee = $request->user()->employee;
@@ -25,7 +26,8 @@ class DocumentController extends Controller
 
         $documents = EmployeeDocument::applyFilters($request, $query);
 
-        $documents->getCollection()->transform(fn($doc) => DocumentHelper::appendFormattedSize($doc));
+        $documents->getCollection()
+            ->transform(fn($doc) => DocumentHelper::appendFormattedSize($doc));
 
         return $this->success(['documents' => $documents], 'Your documents retrieved successfully.');
     }
@@ -44,18 +46,18 @@ class DocumentController extends Controller
             $filePath = $file->storeAs($directory, $fileName, 'private');
 
             $document = EmployeeDocument::create([
-                'employee_id' => $employee->id,
+                'employee_id'      => $employee->id,
                 'document_type_id' => $documentType->id,
-                'file_name' => $file->getClientOriginalName(),
-                'file_path' => $filePath,
-                'file_size' => $file->getSize(),
-                'mime_type' => $file->getMimeType(),
-                'description' => $request->description,
-                'uploaded_by' => $request->user()->id,
+                'file_name'        => $file->getClientOriginalName(),
+                'file_path'        => $filePath,
+                'file_size'        => $file->getSize(),
+                'mime_type'        => $file->getMimeType(),
+                'description'      => $request->description,
+                'uploaded_by'      => $request->user()->id,
             ]);
 
             $document->load('documentType');
-            $document->formatted_size = $document->formatted_size;
+            DocumentHelper::appendFormattedSize($document);
 
             DB::commit();
 
@@ -63,31 +65,28 @@ class DocumentController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Document Upload Error: ' . $e->getMessage(), ['exception' => $e]);
+
             return $this->serverError('An error occurred while uploading the document.');
         }
     }
 
-    public function showMyDocument(Request $request, $documentId)
+    public function showMyDocument(Request $request, EmployeeDocument $document)
     {
         $employee = $request->user()->employee;
 
-        $document = EmployeeDocument::where('employee_id', $employee->id)
-            ->where('id', $documentId)
-            ->with(['uploader:id,name,email', 'documentType'])
-            ->firstOrFail();
+        abort_if($document->employee_id !== $employee->id, 403);
 
-        $document->formatted_size = $document->formatted_size;
+        $document->load(['uploader:id,name,email', 'documentType']);
+        DocumentHelper::appendFormattedSize($document);
 
         return $this->success(['document' => $document], 'Document retrieved successfully.');
     }
 
-    public function updateMyDocument(Request $request, $documentId)
+    public function updateMyDocument(Request $request, EmployeeDocument $document)
     {
         $employee = $request->user()->employee;
 
-        $document = EmployeeDocument::where('employee_id', $employee->id)
-            ->where('id', $documentId)
-            ->firstOrFail();
+        abort_if($document->employee_id !== $employee->id, 403);
 
         $updateData = $request->only(['description', 'document_type_id']);
 
@@ -96,42 +95,41 @@ class DocumentController extends Controller
             $document->load('documentType');
         }
 
-        $document->formatted_size = $document->formatted_size;
+        DocumentHelper::appendFormattedSize($document);
 
         return $this->success(['document' => $document], 'Document updated successfully.');
     }
 
-    public function deleteMyDocument(Request $request, $documentId)
+    public function deleteMyDocument(Request $request, EmployeeDocument $document)
     {
         $employee = $request->user()->employee;
 
-        $document = EmployeeDocument::where('employee_id', $employee->id)
-            ->where('id', $documentId)
-            ->firstOrFail();
+        abort_if($document->employee_id !== $employee->id, 403);
 
         DB::beginTransaction();
         try {
             if (Storage::disk('private')->exists($document->file_path)) {
                 Storage::disk('private')->delete($document->file_path);
             }
+
             $document->delete();
+
             DB::commit();
 
             return $this->success(null, 'Document deleted successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Document Deletion Error: ' . $e->getMessage(), ['exception' => $e]);
+
             return $this->serverError('An error occurred while deleting the document.');
         }
     }
 
-    public function downloadMyDocument(Request $request, $documentId)
+    public function downloadMyDocument(Request $request, EmployeeDocument $document)
     {
         $employee = $request->user()->employee;
 
-        $document = EmployeeDocument::where('employee_id', $employee->id)
-            ->where('id', $documentId)
-            ->firstOrFail();
+        abort_if($document->employee_id !== $employee->id, 403);
 
         if (!Storage::disk('private')->exists($document->file_path)) {
             abort(404, 'The document file was not found.');
@@ -147,13 +145,15 @@ class DocumentController extends Controller
     // ==========================
     // Admin / Manager
     // ==========================
+
     public function index(Request $request)
     {
         $query = EmployeeDocument::with(['employee', 'documentType', 'uploader']);
 
         $documents = EmployeeDocument::applyFilters($request, $query);
 
-        $documents->getCollection()->transform(fn($doc) => DocumentHelper::appendFormattedSize($doc));
+        $documents->getCollection()
+            ->transform(fn($doc) => DocumentHelper::appendFormattedSize($doc));
 
         return $this->success(['documents' => $documents], 'Documents retrieved successfully.');
     }
@@ -161,7 +161,7 @@ class DocumentController extends Controller
     public function show(EmployeeDocument $document)
     {
         $document->load(['employee', 'documentType', 'uploader']);
-        $document->formatted_size = DocumentHelper::appendFormattedSize($document);
+        DocumentHelper::appendFormattedSize($document);
 
         return $this->success(['document' => $document], 'Document retrieved successfully.');
     }

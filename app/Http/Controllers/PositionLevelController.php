@@ -20,11 +20,9 @@ class PositionLevelController extends Controller
     /**
      * Display the specified position level.
      */
-    public function show($id): JsonResponse
+    public function show(PositionLevel $positionLevel): JsonResponse
     {
-        $level = PositionLevel::findOrFail($id);
-
-        return $this->success(['position_level' => $level], 'Position level retrieved successfully.');
+        // Automatically resolved by Laravel's route model binding
+        return $this->success(['position_level' => $positionLevel], 'Position level retrieved successfully.');
     }
 }
-
