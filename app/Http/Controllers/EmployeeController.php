@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\PasswordGenerator;
-use App\Helpers\SearchFilter;
 use App\Http\Requests\EmployeeRequest;
+use App\Http\Resources\UserResource;
 use App\Models\Employee;
 use App\Models\User;
 use App\Models\Role;
@@ -22,38 +22,27 @@ class EmployeeController extends Controller
     public function index(Request $request): JsonResponse
     {
         $query = Employee::with([
-            'user',
+            'user.roles',                     // include roles for UserResource
+            'position.positionLevel',
+            'department',
             'company',
             'branch',
-            'department',
-            'position',
-            'manager',
             'status'
         ]);
 
-        $employees = SearchFilter::for($query)
-            ->search($request->query('search'))
-            ->filters([
-                'company_id' => $request->query('company_id'),
-                'branch_id' => $request->query('branch_id'),
-                'department_id' => $request->query('department_id'),
-                'position_id' => $request->query('position_id'),
-                'manager_id' => $request->query('manager_id'),
-                'employee_status_id' => $request->query('employee_status_id'),
-            ])
-            ->sort(
-                $request->query('sort_field', 'created_at'),
-                $request->query('sort_order', 'desc')
-            )
-            ->paginate((int) $request->query('per_page', 20));
+        // 🔥 Apply model-level filters
+        $employees = Employee::applyFilters($request, $query);
 
-        return $this->success(['employees' => $employees], 'Employees retrieved successfully.');
+        // Map employees to their users
+        $users = $employees->map(fn($employee) => $employee->user);
+
+        return $this->success([
+            'employees' => UserResource::collection($users)
+        ], 'Employees retrieved successfully.');
     }
 
     /**
      * Store a newly created employee with user account.
-     * - Always assigns "employee" role
-     * - If admin + is_manager = true → assigns "employee" + "manager"
      */
     public function store(EmployeeRequest $request): JsonResponse
     {
@@ -74,13 +63,11 @@ class EmployeeController extends Controller
                 ->exists();
 
             $roleNames = ['employee'];
-
             if ($isAdmin && $request->boolean('is_manager')) {
                 $roleNames[] = 'manager';
             }
 
             $roleIds = Role::whereIn('name', $roleNames)->pluck('id');
-
             $user->roles()->syncWithoutDetaching($roleIds);
 
             $employee = Employee::create([
@@ -108,12 +95,17 @@ class EmployeeController extends Controller
                 ])
             ]);
 
-            $employee->load(['user', 'company', 'branch', 'position']);
+            $employee->load([
+                'user.roles',
+                'company',
+                'branch',
+                'position.positionLevel'
+            ]);
 
             DB::commit();
 
             return $this->created([
-                'employee' => $employee,
+                'employee' => new UserResource($employee->user),
                 'generated_password' => $password,
                 'password_note' => 'Password was auto-generated. Please share this securely.',
             ], 'Employee created successfully.');
@@ -135,92 +127,88 @@ class EmployeeController extends Controller
     public function show($employee): JsonResponse
     {
         $employee = Employee::with([
-            'user',
+            'user.roles',
+            'position.positionLevel',
+            'department',
             'company',
             'branch',
-            'position',
-            'manager',
-            'creator',
             'status'
         ])->findOrFail($employee);
 
-        return $this->success(['employee' => $employee], 'Employee retrieved successfully.');
+        return $this->success([
+            'employee' => new UserResource($employee->user)
+        ], 'Employee retrieved successfully.');
     }
 
     /**
      * Update the specified employee.
-     * - Admin can toggle manager role
-     * - Manager cannot modify manager role
      */
     public function update(EmployeeRequest $request, $employee): JsonResponse
     {
         try {
             DB::beginTransaction();
 
-            $employee = Employee::with('user')->findOrFail($employee);
+            $employee = Employee::with('user.roles')->findOrFail($employee);
             $user = $employee->user;
 
             if ($request->filled('email')) {
-                $user->update([
-                    'email' => $request->email,
-                ]);
+                $user->update(['email' => $request->email]);
             }
 
             if ($request->filled('password')) {
-                $user->update([
-                    'password' => Hash::make($request->password),
-                ]);
+                $user->update(['password' => Hash::make($request->password)]);
             }
 
             if ($request->has('is_manager')) {
-
                 $isAdmin = $request->user()
                     ->roles()
                     ->where('name', 'admin')
                     ->exists();
 
                 if ($isAdmin) {
-
                     $roleNames = ['employee'];
-
                     if ($request->boolean('is_manager')) {
                         $roleNames[] = 'manager';
                     }
 
                     $roleIds = Role::whereIn('name', $roleNames)->pluck('id');
-
                     $user->roles()->sync($roleIds);
                 }
             }
 
-            $employee->update(
-                $request->only([
-                    'company_id',
-                    'branch_id',
-                    'position_id',
-                    'manager_id',
-                    'employee_status_id',
-                    'first_name',
-                    'last_name',
-                    'middle_name',
-                    'address_line_1',
-                    'address_line_2',
-                    'city',
-                    'state',
-                    'postal_code',
-                    'country',
-                    'phone',
-                    'hire_date',
-                    'birthdate',
-                    'base_salary',
-                ])
-            );
+            $employee->update($request->only([
+                'company_id',
+                'branch_id',
+                'position_id',
+                'manager_id',
+                'employee_status_id',
+                'first_name',
+                'last_name',
+                'middle_name',
+                'address_line_1',
+                'address_line_2',
+                'city',
+                'state',
+                'postal_code',
+                'country',
+                'phone',
+                'hire_date',
+                'birthdate',
+                'base_salary',
+            ]));
 
-            $employee->load(['user', 'company', 'branch', 'position']);
+            $employee->load([
+                'user.roles',
+                'company',
+                'branch',
+                'position.positionLevel'
+            ]);
 
             DB::commit();
 
-            return $this->success(['employee' => $employee], 'Employee updated successfully.');
+            return $this->success([
+                'employee' => new UserResource($employee->user)
+            ], 'Employee updated successfully.');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -235,7 +223,6 @@ class EmployeeController extends Controller
 
     /**
      * Remove the specified employee.
-     * Only admin should be allowed via middleware/policy.
      */
     public function destroy($employee): JsonResponse
     {
@@ -243,7 +230,6 @@ class EmployeeController extends Controller
             DB::beginTransaction();
 
             $employee = Employee::with('user')->findOrFail($employee);
-
             $employee->user->delete();
 
             DB::commit();

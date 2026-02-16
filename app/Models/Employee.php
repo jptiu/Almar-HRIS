@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\HasSearchFilter;
 use Illuminate\Database\Eloquent\Model;
 
 class Employee extends Model
 {
+    use HasSearchFilter;
+
     protected $fillable = [
         'user_id',
         'created_by',
@@ -36,8 +39,10 @@ class Employee extends Model
         'base_salary' => 'decimal:2',
     ];
 
-    // Protected searchable fields for automatic global search
-    protected $searchable = [
+    /**
+     * Fields used for global search
+     */
+    public array $searchable = [
         'first_name',
         'last_name',
         'middle_name',
@@ -46,9 +51,59 @@ class Employee extends Model
         'branch.name',
         'department.name',
         'position.title',
+        'leaveCredits.year',       // searchable by year
+        'leaveCredits.total_days', // searchable by total days
+        'leaveCredits.used_days',  // searchable by used days
+        'leaveCredits.remaining_days', // searchable by remaining days
     ];
 
-    // Relationships
+    /**
+     * Allowed filters (must match your SearchFilter helper logic)
+     */
+    public array $allowedFilters = [
+        'department_id',
+        'branch_id',
+        'company_id',
+        'position_id',
+        'employee_status_id',
+
+        // range filters (your helper supports _from/_to and _min/_max)
+        'hire_date_from',
+        'hire_date_to',
+        'birthdate_from',
+        'birthdate_to',
+        'base_salary_min',
+        'base_salary_max',
+
+        // relation filters
+        'department.name',
+        'branch.name',
+        'company.name',
+        'position.title',
+        'user.email',
+        'leaveCredits.year',       // filter by year
+        'leaveCredits.total_days', // filter by total days
+        'leaveCredits.used_days',  // filter by used days
+        'leaveCredits.remaining_days', // filter by remaining days
+    ];
+
+    /**
+     * Allowed sorting columns
+     */
+    public array $allowedSorts = [
+        'created_at',
+        'first_name',
+        'last_name',
+        'hire_date',
+        'base_salary',
+    ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Relationships
+    |--------------------------------------------------------------------------
+    */
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -97,5 +152,13 @@ class Employee extends Model
     public function documents()
     {
         return $this->hasMany(EmployeeDocument::class);
+    }
+
+    /**
+     * 🔥 Needed for your leave credits endpoint
+     */
+    public function leaveCredits()
+    {
+        return $this->hasMany(LeaveCredit::class);
     }
 }

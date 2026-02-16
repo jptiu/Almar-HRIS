@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Traits\HasSearchFilter;
 
 class EmployeeDocument extends Model
 {
+    use HasSearchFilter;
+
     // Fillable fields for mass assignment
     protected $fillable = [
         'employee_id',
@@ -22,16 +25,34 @@ class EmployeeDocument extends Model
     // Casts for proper data types
     protected $casts = [
         'file_size' => 'integer',
-        'uploaded_by' => 'integer', // optional, for safety
+        'uploaded_by' => 'integer',
     ];
 
-    // Protected searchable fields for global search
-    protected $searchable = [
+    // 🔥 Searchable fields for global search
+    public array $searchable = [
         'file_name',
         'description',
         'employee.first_name',
         'employee.last_name',
         'documentType.name',
+        'uploader.name',
+        'uploader.email',
+    ];
+
+    // 🔥 Filterable fields
+    public array $allowedFilters = [
+        'employee_id',
+        'document_type_id',
+        'uploaded_by',
+        'created_at_from',
+        'created_at_to',
+    ];
+
+    // 🔥 Sortable fields
+    public array $allowedSorts = [
+        'created_at',
+        'file_name',
+        'file_size',
     ];
 
     /**
@@ -93,5 +114,13 @@ class EmployeeDocument extends Model
             'application/msword',
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         ];
+    }
+
+    /**
+     * Scope for filtering documents by employee
+     */
+    public function scopeForEmployee($query, int $employeeId)
+    {
+        return $query->where('employee_id', $employeeId);
     }
 }
