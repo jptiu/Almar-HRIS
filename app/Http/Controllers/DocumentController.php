@@ -3,15 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\DocumentRequest;
-use App\Models\Employee;
 use App\Models\EmployeeDocument;
 use App\Models\DocumentType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-use App\Helpers\SearchFilter;
 use App\Helpers\DocumentHelper;
+use Illuminate\Support\Facades\Log;
 
 class DocumentController extends Controller
 {
@@ -22,24 +20,14 @@ class DocumentController extends Controller
     {
         $employee = $request->user()->employee;
 
-        $documentsQuery = EmployeeDocument::where('employee_id', $employee->id)
+        $query = EmployeeDocument::where('employee_id', $employee->id)
             ->with(['uploader:id,name,email', 'documentType']);
 
-        $documents = SearchFilter::for($documentsQuery)
-            ->search($request->search) // global search
-            ->filters([                // optional filters
-                'status' => $request->status,
-                'document_type_id' => $request->document_type_id,
-            ])
-            ->sort($request->sort_by ?? 'created_at', $request->sort_order ?? 'desc')
-            ->paginate($request->per_page ?? 15);
+        $documents = EmployeeDocument::applyFilters($request, $query);
 
         $documents->getCollection()->transform(fn($doc) => DocumentHelper::appendFormattedSize($doc));
 
-        return $this->success([
-            'documents' => $documents,
-            'filters' => $request->only(['search', 'status', 'document_type_id', 'sort_by', 'sort_order', 'per_page']),
-        ], 'Your documents retrieved successfully.');
+        return $this->success(['documents' => $documents], 'Your documents retrieved successfully.');
     }
 
     public function storeMyDocument(DocumentRequest $request)
@@ -74,7 +62,7 @@ class DocumentController extends Controller
             return $this->created(['document' => $document], 'Document uploaded successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            \Illuminate\Support\Facades\Log::error('Document Upload Error: ' . $e->getMessage(), ['exception' => $e]);
+            Log::error('Document Upload Error: ' . $e->getMessage(), ['exception' => $e]);
             return $this->serverError('An error occurred while uploading the document.');
         }
     }
@@ -101,9 +89,7 @@ class DocumentController extends Controller
             ->where('id', $documentId)
             ->firstOrFail();
 
-        $updateData = [];
-        if ($request->has('description')) $updateData['description'] = $request->description;
-        if ($request->has('document_type_id')) $updateData['document_type_id'] = $request->document_type_id;
+        $updateData = $request->only(['description', 'document_type_id']);
 
         if (!empty($updateData)) {
             $document->update($updateData);
@@ -134,7 +120,7 @@ class DocumentController extends Controller
             return $this->success(null, 'Document deleted successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            \Illuminate\Support\Facades\Log::error('Document Deletion Error: ' . $e->getMessage(), ['exception' => $e]);
+            Log::error('Document Deletion Error: ' . $e->getMessage(), ['exception' => $e]);
             return $this->serverError('An error occurred while deleting the document.');
         }
     }
@@ -163,21 +149,9 @@ class DocumentController extends Controller
     // ==========================
     public function index(Request $request)
     {
-        $documentsQuery = EmployeeDocument::with(['employee', 'documentType', 'uploader']);
+        $query = EmployeeDocument::with(['employee', 'documentType', 'uploader']);
 
-        $documents = SearchFilter::for($documentsQuery)
-            ->search($request->query('search'))
-            ->filters([
-                'employee_id' => $request->query('employee_id'),
-                'document_type_id' => $request->query('document_type_id'),
-                'employee.company_id' => $request->query('company_id'),
-                'employee.branch_id' => $request->query('branch_id'),
-            ])
-            ->sort(
-                $request->query('sort_by', 'created_at'),
-                $request->query('sort_order', 'desc')
-            )
-            ->paginate((int) $request->query('per_page', 20));
+        $documents = EmployeeDocument::applyFilters($request, $query);
 
         $documents->getCollection()->transform(fn($doc) => DocumentHelper::appendFormattedSize($doc));
 
@@ -189,9 +163,7 @@ class DocumentController extends Controller
         $document->load(['employee', 'documentType', 'uploader']);
         $document->formatted_size = DocumentHelper::appendFormattedSize($document);
 
-        return $this->success([
-            'document' => $document
-        ], 'Document retrieved successfully.');
+        return $this->success(['document' => $document], 'Document retrieved successfully.');
     }
 
     public function download(EmployeeDocument $document)

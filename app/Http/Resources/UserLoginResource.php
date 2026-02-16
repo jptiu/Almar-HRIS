@@ -10,12 +10,37 @@ class UserLoginResource extends JsonResource
     {
         $employee = $this->employee;
 
+        $isAdmin = !$employee || $this->roles->contains('name', 'admin');
+
+        if ($isAdmin) {
+            // Static/default data for admin users
+            return [
+                'id' => $this->id,
+                'email' => $this->email,
+                'roles' => $this->roles->pluck('name'),
+
+                'employee_id' => null,
+                'first_name' => 'Admin',
+                'middle_name' => null,
+                'last_name' => 'User',
+                'full_name' => 'Admin User',
+
+                'position' => 'Administrator',
+                'position_level' => null,
+                'department' => null,
+                'company' => 'Company Admin',
+                'branch' => null,
+                'manager_id' => null,
+                'employee_status' => 'Active',
+            ];
+        }
+
+        // Regular employee mapping (basic info only)
         return [
             'id' => $this->id,
             'email' => $this->email,
             'roles' => $this->roles->pluck('name'),
 
-            // Basic employee info only (no sensitive data like address, salary, phone)
             'employee_id' => $employee?->id,
             'first_name' => $employee?->first_name,
             'middle_name' => $employee?->middle_name,
@@ -24,7 +49,6 @@ class UserLoginResource extends JsonResource
                 ? trim($employee->first_name . ' ' . ($employee->middle_name ? $employee->middle_name . ' ' : '') . $employee->last_name)
                 : null,
 
-            // Job details only (no personal info)
             'position' => $employee?->position?->title,
             'position_level' => $employee?->position?->positionLevel?->name ?? null,
             'department' => $employee?->department?->name,
@@ -35,4 +59,3 @@ class UserLoginResource extends JsonResource
         ];
     }
 }
-

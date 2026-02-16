@@ -4,50 +4,36 @@ namespace App\Helpers;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
-use ReflectionProperty;
 
 class SearchFilter
 {
     protected Builder $query;
+    protected array $allowedFilters = [];
+    protected array $allowedSorts = [];
+    protected array $searchable = [];
 
-    /**
-     * Initialize with a query builder
-     */
     public function __construct(Builder $query)
     {
         $this->query = $query;
+
+        $model = $query->getModel();
+
+        $this->allowedFilters = $model->allowedFilters ?? [];
+        $this->allowedSorts = $model->allowedSorts ?? [];
+        $this->searchable = $model->searchable ?? [];
     }
 
-    /**
-     * Static constructor for fluent syntax
-     */
     public static function for(Builder $query): self
     {
         return new self($query);
     }
 
-    /**
-     * Global keyword search
-     * Supports direct and related columns (dot notation)
-     * If no columns passed, will use $searchable property in model if defined
-     */
-    public function search(?string $term, array $columns = []): self
+    public function search(?string $term): self
     {
-        if (!$term) return $this;
+        if (!$term || empty($this->searchable)) return $this;
 
-        if (empty($columns)) {
-            $model = $this->query->getModel();
-
-            if (property_exists($model, 'searchable')) {
-                $ref = new \ReflectionProperty($model, 'searchable');
-                $columns = $ref->getValue($model); // pass model object
-            }
-        }
-
-        if (empty($columns)) return $this;
-
-        $this->query->where(function ($q) use ($term, $columns) {
-            foreach ($columns as $column) {
+        $this->query->where(function ($q) use ($term) {
+            foreach ($this->searchable as $column) {
                 if (str_contains($column, '.')) {
                     [$relation, $relColumn] = explode('.', $column);
                     $q->orWhereHas($relation, fn($rq) => $rq->where($relColumn, 'like', "%{$term}%"));
@@ -60,23 +46,38 @@ class SearchFilter
         return $this;
     }
 
-    /**
-     * Apply exact-match filters from flat query params
-     * Example: ['status' => 'approved', 'employee_id' => 1]
-     */
     public function filters(array $filters): self
     {
         foreach ($filters as $column => $value) {
-            if (empty($value)) continue;
+            if (!in_array($column, $this->allowedFilters) || $value === null || $value === '') {
+                continue;
+            }
 
-            if (str_contains($column, '.')) {
-                // Relation filter
+            if (is_array($value)) {
+                $this->query->whereIn($column, $value);
+            } elseif (str_ends_with($column, '_from')) {
+                $this->query->whereDate(str_replace('_from', '', $column), '>=', $value);
+            } elseif (str_ends_with($column, '_to')) {
+                $this->query->whereDate(str_replace('_to', '', $column), '<=', $value);
+            } elseif (str_ends_with($column, '_min')) {
+                $this->query->where(
+                    str_replace('_min', '', $column),
+                    '>=',
+                    $value
+                );
+            } elseif (str_ends_with($column, '_max')) {
+                $this->query->where(
+                    str_replace('_max', '', $column),
+                    '<=',
+                    $value
+                );
+            } elseif (str_contains($column, '.')) {
                 [$relation, $relationColumn] = explode('.', $column);
+
                 $this->query->whereHas($relation, function ($q) use ($relationColumn, $value) {
                     $q->where($relationColumn, $value);
                 });
             } else {
-                // Normal column filter
                 $this->query->where($column, $value);
             }
         }
@@ -84,34 +85,33 @@ class SearchFilter
         return $this;
     }
 
-    /**
-     * Apply sorting
-     */
-    public function sort(string $field = 'created_at', string $order = 'desc'): self
+    public function sort(?string $field, ?string $direction = 'desc'): self
     {
-        $this->query->orderBy($field, $order);
+        $field = $field ?? 'created_at';
+        $direction = strtolower($direction) === 'asc' ? 'asc' : 'desc';
+
+        if (!in_array($field, $this->allowedSorts)) return $this;
+
+        if (str_contains($field, '.')) {
+            [$relation, $relationColumn] = explode('.', $field);
+            $this->query->joinRelation($relation)->orderBy($relation . '.' . $relationColumn, $direction);
+        } else {
+            $this->query->orderBy($field, $direction);
+        }
+
         return $this;
     }
 
-    /**
-     * Paginate results
-     */
     public function paginate(int $perPage = 15): LengthAwarePaginator
     {
         return $this->query->paginate($perPage);
     }
 
-    /**
-     * Get collection without pagination
-     */
     public function get()
     {
         return $this->query->get();
     }
 
-    /**
-     * Access the raw query builder if needed
-     */
     public function query(): Builder
     {
         return $this->query;

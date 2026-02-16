@@ -25,7 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'auth.session' => \Illuminate\Session\Middleware\AuthenticateSession::class,
+            'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
             'role' => \App\Http\Middleware\CheckRole::class,
         ]);
     })
@@ -62,15 +62,12 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($e instanceof AuthenticationException) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Unauthenticated',
+                    'message' => $e->getMessage(),
                 ], 401);
             }
 
             /**
              * Forbidden / Unauthorized (403)
-             *
-             * IMPORTANT:
-             * Laravel converts AuthorizationException into AccessDeniedHttpException
              */
             if (
                 $e instanceof AuthorizationException ||
@@ -78,7 +75,7 @@ return Application::configure(basePath: dirname(__DIR__))
             ) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Forbidden',
+                    'message' => $e->getMessage(),
                 ], 403);
             }
 

@@ -12,6 +12,8 @@ use App\Http\Controllers\PositionLevelController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\DocumentTypeController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LeaveController;
+use App\Http\Controllers\LeaveTypeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,7 +23,7 @@ use App\Http\Controllers\DashboardController;
 
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 
-Route::middleware('auth.session')->group(function () {
+Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
@@ -36,7 +38,7 @@ Route::middleware('auth.session')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
 
         Route::post('/switch-role', [AuthController::class, 'switchRole']);
-        
+
         // My Documents
         Route::prefix('documents')->group(function () {
             Route::get('/', [DocumentController::class, 'myDocuments']);
@@ -45,6 +47,14 @@ Route::middleware('auth.session')->group(function () {
             Route::put('{document}', [DocumentController::class, 'updateMyDocument']);
             Route::delete('{document}', [DocumentController::class, 'deleteMyDocument']);
             Route::get('{document}/download', [DocumentController::class, 'downloadMyDocument']);
+        });
+
+        // My Leave (Employee Self-Service)
+        Route::prefix('leave')->group(function () {
+            Route::get('/credits', [LeaveController::class, 'myLeaveCredits']);
+            Route::get('/requests', [LeaveController::class, 'myLeaveRequests']);
+            Route::post('/requests', [LeaveController::class, 'submitLeaveRequest']);
+            Route::put('/requests/{leaveRequest}', [LeaveController::class, 'cancelMyLeaveRequest']);
         });
     });
 
@@ -56,6 +66,7 @@ Route::middleware('auth.session')->group(function () {
     Route::get('/document-types', [DocumentTypeController::class, 'index']);
     Route::get('/employee-statuses', [EmployeeStatusController::class, 'index']);
     Route::get('/position-levels', [PositionLevelController::class, 'index']);
+    Route::get('/leave-types', [LeaveTypeController::class, 'index']);
 
     /*
     |--------------------------------------------------------------------------
@@ -155,5 +166,26 @@ Route::middleware('auth.session')->group(function () {
                 Route::get('/salary-stats', [DashboardController::class, 'salaryStatsByDepartment']);
             });
         });
-    });
+
+        /*
+        |--------------------------------------------------------------------------
+        | Leave Management (Admin/Manager)
+        |--------------------------------------------------------------------------
+        */
+
+        // Leave Requests (Admin/Manager)
+        Route::prefix('leave-requests')->group(function () {
+            Route::get('/', [LeaveController::class, 'index']);
+            Route::get('{leaveRequest}', [LeaveController::class, 'show']);
+            Route::put('{leaveRequest}/review', [LeaveController::class, 'review']);
+        });
+
+        Route::get('leave-credits', [LeaveController::class, 'allEmployeesLeaveCredits']);
+
+        // Employee Leave Credits Management (Admin/Manager)
+        Route::prefix('employees/{employee}')->group(function () {
+            Route::get('/leave-credits', [LeaveController::class, 'employeeLeaveCredits']);
+            Route::patch('/leave-credits', [LeaveController::class, 'adjustLeaveCredits']);
+        });
+    });  
 });
