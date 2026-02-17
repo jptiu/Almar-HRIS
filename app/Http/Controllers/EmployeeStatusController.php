@@ -20,11 +20,9 @@ class EmployeeStatusController extends Controller
     /**
      * Display the specified employee status.
      */
-    public function show($id): JsonResponse
+    public function show(EmployeeStatus $employeeStatus): JsonResponse
     {
-        $status = EmployeeStatus::findOrFail($id);
-
-        return $this->success(['employee_status' => $status], 'Employee status retrieved successfully.');
+        // $employeeStatus is automatically injected by Laravel's route model binding
+        return $this->success(['employee_status' => $employeeStatus], 'Employee status retrieved successfully.');
     }
 }
-

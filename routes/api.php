@@ -14,6 +14,7 @@ use App\Http\Controllers\DocumentTypeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\LeaveTypeController;
+use App\Http\Controllers\RequestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -119,6 +120,16 @@ Route::middleware('auth')->group(function () {
         */
         Route::apiResource('positions', PositionController::class);
 
+
+        Route::prefix('employees')->group(function () {
+            Route::get('leave-credits', [LeaveController::class, 'index']); // index all employees leave credits
+
+            // Specific employee leave credits
+            Route::prefix('{employee}')->group(function () {
+                Route::get('/leave-credits', [LeaveController::class, 'show']);    // show employee leave credits
+                Route::patch('/leave-credits', [LeaveController::class, 'adjustadLeaveCredits']); // adjust employee leave credits
+            });
+        });
         /*
         |--------------------------------------------------------------------------
         | Employees
@@ -175,17 +186,9 @@ Route::middleware('auth')->group(function () {
 
         // Leave Requests (Admin/Manager)
         Route::prefix('leave-requests')->group(function () {
-            Route::get('/', [LeaveController::class, 'index']);
-            Route::get('{leaveRequest}', [LeaveController::class, 'show']);
-            Route::put('{leaveRequest}/review', [LeaveController::class, 'review']);
-        });
-
-        Route::get('leave-credits', [LeaveController::class, 'allEmployeesLeaveCredits']);
-
-        // Employee Leave Credits Management (Admin/Manager)
-        Route::prefix('employees/{employee}')->group(function () {
-            Route::get('/leave-credits', [LeaveController::class, 'employeeLeaveCredits']);
-            Route::patch('/leave-credits', [LeaveController::class, 'adjustLeaveCredits']);
+            Route::get('/', [RequestController::class, 'index']);
+            Route::get('{leaveRequest}', [RequestController::class, 'show']);
+            Route::put('{leaveRequest}/review', [RequestController::class, 'review']);
         });
     });
 });
