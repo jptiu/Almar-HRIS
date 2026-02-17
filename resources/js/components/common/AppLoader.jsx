@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/stores";
 import { useLocation, useNavigate } from "react-router-dom";
-import LoadingSpinner from "./LoadingSpinner";
+import { LoadingSpinner } from ".";
 
-const AppLoader = ({ children }) => {
+export const AppLoader = ({ children }) => {
   const initializeAuth = useAuthStore((state) => state.initializeAuth);
   const isLoading = useAuthStore((state) => state.isLoading);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -57,5 +57,3 @@ const AppLoader = ({ children }) => {
 
   return children;
 };
-
-export default AppLoader;

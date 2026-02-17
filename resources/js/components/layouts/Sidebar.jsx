@@ -2,7 +2,7 @@
 import { useEffect, useCallback } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuthStore, useUIStore } from "@/stores";
-import { useSwitchRoleMutation } from "../hooks";
+import { useSwitchRoleMutation } from "@/pages/auth/hooks";
 import { navigationConfig } from "@/config/navigationConfig";
 import { useMediaQuery } from "@/hooks";
 import { cn } from "../../utils/cn";

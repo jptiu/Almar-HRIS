@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import { User, Settings, LogOut, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../../pages/auth/hooks/useAuth";
 import { cn } from "../utils/cn";
 
 const UserMenu = ({ user }) => {

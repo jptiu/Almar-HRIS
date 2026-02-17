@@ -8,8 +8,7 @@ import {
     PendingLeaveRequests,
     RecentEmployees,
 } from ".";
-import { EmployeesBirthdayCard } from "@/components/common";
-import { LeaveCalendar } from "@/components/common";
+import { EmployeesBirthdayCard, LeaveCalendar } from "@/components/widgets";
 
 export const Dashboard = () => {
     const greeting = useGreeting();

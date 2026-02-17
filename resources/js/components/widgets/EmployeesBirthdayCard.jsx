@@ -2,11 +2,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BirthdayTodayCard } from "./BirthdayTodayCard";
 import { UpcomingBirthdayGroup } from "./UpcomingBirthdayGroup";
-import { employeesBirthday } from "@/data/mockData";
 
-export const EmployeesBirthdayCard = () => {
-    const today = employeesBirthday.today;
-    const upcoming = employeesBirthday.upcoming;
+export const EmployeesBirthdayCard = ({ today, upcoming }) => {
     return (
         <Card className="w-full h-180 flex flex-col">
             {/* Card header stays fixed */}
@@ -40,11 +37,9 @@ export const EmployeesBirthdayCard = () => {
                         </div>
                     </div>
                 ) : (
-                    <div className="rounded-lg bg-muted/50 border border-dashed p-4 text-center">
-                        <p className="text-sm text-muted-foreground">
-                            No birthdays today
-                        </p>
-                    </div>
+                    <p className="text-gray-400 italic text-sm">
+                        No birthdays today.
+                    </p>
                 )}
 
                 {/* UPCOMING */}
@@ -62,11 +57,9 @@ export const EmployeesBirthdayCard = () => {
                         ))}
                     </div>
                 ) : (
-                    <div className="rounded-lg bg-muted/50 border border-dashed p-4 text-center">
-                        <p className="text-sm text-muted-foreground">
-                            No upcoming birthdays for the next 15 days
-                        </p>
-                    </div>
+                    <p className="text-gray-400 italic text-sm">
+                        No upcoming birthdays.
+                    </p>
                 )}
             </CardContent>
         </Card>

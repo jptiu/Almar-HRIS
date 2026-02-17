@@ -13,7 +13,7 @@ import {
     adminRoutes,
     employeeRoutes,
 } from "./routes";
-import AppLoader from "./components/AppLoader";
+import { AppLoader } from "./components/common";
 import RoleBasedRoute from "./components/layouts/RoleBasedRoute";
 import DashboardLayout from "./components/layouts/DashboardLayout";
 

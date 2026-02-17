@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { Mail, Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
 
-import InputField from "./ui/InputField";
-import { useLoginMutation } from "./hooks";
+import { InputField } from "@/components/ui";
+import { useLoginMutation } from "../hooks";
 
-export default function LoginForm() {
+export const LoginForm = () => {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");

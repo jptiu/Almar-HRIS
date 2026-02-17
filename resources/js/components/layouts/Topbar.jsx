@@ -2,8 +2,8 @@
 import { useState, useTransition } from "react";
 import { Menu, Bell, Search } from "lucide-react";
 import { useNotificationStore, useAuthStore, useUIStore } from "@/stores";
-import NotificationPanel from "../NotificationPanel";
-import { useMediaQuery } from "../../hooks/useMediaQuery";
+import { NotificationPanel } from "../common";
+import { useMediaQuery } from "@/hooks";
 
 const Topbar = () => {
     const [isPending, startTransition] = useTransition();
