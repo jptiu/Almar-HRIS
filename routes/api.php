@@ -15,6 +15,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\LeaveTypeController;
 use App\Http\Controllers\RequestController;
+use App\Http\Controllers\AttendanceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,22 +41,32 @@ Route::middleware('auth')->group(function () {
 
         Route::post('/switch-role', [AuthController::class, 'switchRole']);
 
-        // My Documents
-        Route::prefix('documents')->group(function () {
-            Route::get('/', [DocumentController::class, 'myDocuments']);
-            Route::post('/', [DocumentController::class, 'storeMyDocument']);
-            Route::get('{document}', [DocumentController::class, 'showMyDocument']);
-            Route::put('{document}', [DocumentController::class, 'updateMyDocument']);
-            Route::delete('{document}', [DocumentController::class, 'deleteMyDocument']);
-            Route::get('{document}/download', [DocumentController::class, 'downloadMyDocument']);
-        });
+        Route::middleware('role:employee')->group(function () {
+            // My Documents
+            Route::prefix('documents')->group(function () {
+                Route::get('/', [DocumentController::class, 'myDocuments']);
+                Route::post('/', [DocumentController::class, 'storeMyDocument']);
+                Route::get('{document}', [DocumentController::class, 'showMyDocument']);
+                Route::put('{document}', [DocumentController::class, 'updateMyDocument']);
+                Route::delete('{document}', [DocumentController::class, 'deleteMyDocument']);
+                Route::get('{document}/download', [DocumentController::class, 'downloadMyDocument']);
+            });
 
-        // My Leave (Employee Self-Service)
-        Route::prefix('leave')->group(function () {
-            Route::get('/credits', [LeaveController::class, 'myLeaveCredits']);
-            Route::get('/requests', [LeaveController::class, 'myLeaveRequests']);
-            Route::post('/requests', [LeaveController::class, 'submitLeaveRequest']);
-            Route::put('/requests/{leaveRequest}', [LeaveController::class, 'cancelMyLeaveRequest']);
+            // My Leave (Employee Self-Service)
+            Route::prefix('leave')->group(function () {
+                Route::get('/credits', [LeaveController::class, 'myLeaveCredits']);
+                Route::get('/requests', [LeaveController::class, 'myLeaveRequests']);
+                Route::post('/requests', [LeaveController::class, 'submitLeaveRequest']);
+                Route::put('/requests/{leaveRequest}', [LeaveController::class, 'cancelMyLeaveRequest']);
+            });
+
+            // My Attendance (Employee Self-Service)
+            Route::prefix('attendance')->group(function () {
+                Route::get('/today', [AttendanceController::class, 'todayAttendance']);
+                Route::post('/clock-in', [AttendanceController::class, 'clockIn']);
+                Route::post('/clock-out', [AttendanceController::class, 'clockOut']);
+                Route::get('/', [AttendanceController::class, 'myAttendance']);
+            });
         });
     });
 
@@ -189,6 +200,24 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [RequestController::class, 'index']);
             Route::get('{leaveRequest}', [RequestController::class, 'show']);
             Route::put('{leaveRequest}/review', [RequestController::class, 'review']);
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | Attendance Management (Admin/Manager)
+        |--------------------------------------------------------------------------
+        */
+        Route::prefix('attendance')->group(function () {
+            // All attendance records
+            Route::get('/', [AttendanceController::class, 'index']);
+
+            // Today's attendance overview
+            Route::get('/today', [AttendanceController::class, 'todayOverview']);
+
+            // Specific employee attendance
+            Route::prefix('employees/{employee}')->group(function () {
+                Route::get('/', [AttendanceController::class, 'showEmployeeAttendance']);
+            });
         });
     });
 });

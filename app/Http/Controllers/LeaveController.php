@@ -217,10 +217,16 @@ class LeaveController extends Controller
             'position:id,title',
         ]);
 
-        $paginated = Employee::applyFilters($request, $query);
+        $employeeLeaveCredits = Employee::applyFilters($request, $query);
 
-        $paginated->getCollection()->transform(function ($employee) use ($year) {
+        $globalSummary = [];
+
+        $employeeLeaveCredits->getCollection()->transform(function ($employee) use ($year, &$globalSummary) {
             $leaveData = $this->computeEmployeeLeaveCredits($employee, $year);
+
+            foreach ($leaveData['summary'] as $key => $value) {
+                $globalSummary[$key] = ($globalSummary[$key] ?? 0) + $value;
+            }
 
             return [
                 'employee' => [
@@ -238,7 +244,7 @@ class LeaveController extends Controller
         });
 
         return $this->success(
-            ['leave_credits_summary' => $paginated],
+            ['employee_leave_credits' => $employeeLeaveCredits, 'overall_summary' => $globalSummary],
             'All employees leave credits summary retrieved successfully.'
         );
     }

@@ -161,4 +161,12 @@ class Employee extends Model
     {
         return $this->hasMany(LeaveCredit::class);
     }
+
+    /**
+     * Get attendance records for this employee.
+     */
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
 }
