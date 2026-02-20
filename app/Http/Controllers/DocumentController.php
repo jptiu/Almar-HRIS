@@ -22,7 +22,7 @@ class DocumentController extends Controller
         $employee = $request->user()->employee;
 
         $query = EmployeeDocument::where('employee_id', $employee->id)
-            ->with(['uploader:id,name,email', 'documentType']);
+            ->with(['uploader:id,email', 'documentType']);
 
         $documents = EmployeeDocument::applyFilters($request, $query);
 
@@ -76,7 +76,7 @@ class DocumentController extends Controller
 
         abort_if($document->employee_id !== $employee->id, 403);
 
-        $document->load(['uploader:id,name,email', 'documentType']);
+        $document->load(['uploader:id,email', 'documentType']);
         DocumentHelper::appendFormattedSize($document);
 
         return $this->success(['document' => $document], 'Document retrieved successfully.');
