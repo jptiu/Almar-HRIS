@@ -1,9 +1,24 @@
-// components/EmployeesBirthdayCard.jsx
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BirthdayTodayCard } from "./BirthdayTodayCard";
 import { UpcomingBirthdayGroup } from "./UpcomingBirthdayGroup";
+import { EmployeesBirthdaySkeleton } from "./EmployeesBirthdaySkeleton";
+import { useEmployeesBirthdaysQuery } from "./hooks";
 
-export const EmployeesBirthdayCard = ({ today, upcoming }) => {
+export const EmployeesBirthdayCard = () => {
+    const { data, isLoading, error } = useEmployeesBirthdaysQuery();
+
+    if (isLoading) return <EmployeesBirthdaySkeleton />;
+    if (error) {
+        return (
+            <Card className="p-6 text-sm text-muted-foreground">
+                Failed to load birthdays
+            </Card>
+        );
+    }
+
+    const today = data?.today ?? [];
+    const upcoming = data?.upcoming ?? [];
+
     return (
         <Card className="w-full h-180 flex flex-col">
             {/* Card header stays fixed */}
@@ -14,7 +29,7 @@ export const EmployeesBirthdayCard = ({ today, upcoming }) => {
             {/* Scrollable content */}
             <CardContent className="flex-1 flex flex-col gap-6 overflow-y-auto min-h-0 p-6">
                 {/* TODAY */}
-                <div className="text-gray-400 font-semibold mb-4 text-xs">
+                <div className="text-gray-400 font-semibold mb-1 text-xs">
                     <p>TODAY'S BIRTHDAYS</p>
 
                     {today && today.length > 0 && (

@@ -1,12 +1,37 @@
 import * as React from "react";
 import { ArrowRight } from "lucide-react";
-import { recentEmployees as employees } from "@/data/mockData";
-import { getInitials, getColorFromName, getStatusVariant, formatStatus } from "@/helpers";
+import { useFetchRecentEmployeesQuery } from "./hooks";
+import { RecentEmployeesSkeleton } from "./RecentEmployeesSkeleton";
+
+import {
+    getInitials,
+    getColorFromName,
+    getStatusVariant,
+    formatStatus,
+} from "@/helpers";
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge, Button } from "@/components/ui";
 
 export function RecentEmployees() {
+    const {
+        data: employees,
+        isLoading,
+        error,
+    } = useFetchRecentEmployeesQuery();
+
+    if (isLoading) return <RecentEmployeesSkeleton />;
+
+    if (error) {
+        return (
+            <Card>
+                <CardContent className="p-6 text-sm text-red-500">
+                    Failed to load recent employees.
+                </CardContent>
+            </Card>
+        );
+    }
+
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">
@@ -16,11 +41,10 @@ export function RecentEmployees() {
                     View all
                     <ArrowRight size={16} />
                 </Button>
-
             </CardHeader>
 
             <CardContent className="space-y-6">
-                {employees.map((emp) => {
+                {employees?.map((emp) => {
                     const initials = getInitials(emp.firstName, emp.lastName);
                     const color = getColorFromName(
                         emp.firstName + emp.lastName,
@@ -31,9 +55,7 @@ export function RecentEmployees() {
                             key={emp.id}
                             className="flex items-center justify-between"
                         >
-                            {/* Left */}
                             <div className="flex items-center gap-4">
-                                {/* Avatar */}
                                 <div
                                     className="h-10 w-10 rounded-full flex items-center justify-center text-white font-semibold"
                                     style={{ backgroundColor: color }}
@@ -41,7 +63,6 @@ export function RecentEmployees() {
                                     {initials}
                                 </div>
 
-                                {/* Info */}
                                 <div>
                                     <p className="font-medium">
                                         {emp.firstName} {emp.lastName}
@@ -52,7 +73,6 @@ export function RecentEmployees() {
                                 </div>
                             </div>
 
-                            {/* Status */}
                             <Badge
                                 variant={getStatusVariant(emp.status)}
                                 size="xs"

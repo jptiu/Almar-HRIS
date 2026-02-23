@@ -1,5 +1,5 @@
 import { useAuthStore } from "@/stores";
-import { useGreeting } from "../../../../hooks/useGreeting";
+import { useGreeting } from "@/hooks";
 import { Users, UserCheck, CalendarOff, TrendingUp } from "lucide-react";
 import { StatCard } from "@/components/ui";
 import {
@@ -19,7 +19,7 @@ export const Dashboard = () => {
             {/* Welcome Header */}
             <div>
                 <h1 className="text-2xl font-bold text-text-dark mb-2">
-                    {greeting}, {user?.user?.full_name || "user"}!
+                    {greeting}, {user?.user?.first_name || "user"}!
                 </h1>
                 <p className="text-text-tertiary">
                     Here's what's happening with your company today.

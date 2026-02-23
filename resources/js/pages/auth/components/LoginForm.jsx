@@ -53,6 +53,7 @@ export const LoginForm = () => {
                         onChange={(e) => setEmail(e.target.value)}
                         rightIcon={Mail}
                         size="xs"
+                        variant="dark"
                     />
 
                     <InputField
@@ -66,6 +67,7 @@ export const LoginForm = () => {
                         togglePassword={() => setShowPassword((prev) => !prev)}
                         rightIcon={showPassword ? EyeOff : Eye}
                         size="xs"
+                        variant="dark"
                     />
 
                     <div className="flex gap-4 pt-6">

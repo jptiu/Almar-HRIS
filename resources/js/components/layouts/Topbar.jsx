@@ -49,9 +49,9 @@ const Topbar = () => {
                             <Menu className="w-5 h-5 text-gray-700" />
                         </button>
                     )}
-                    <h1 className="text-xl font-semibold text-gray-800">
+                    {/* <h1 className="text-xl font-semibold text-gray-800">
                         Dashboard
-                    </h1>
+                    </h1> */}
                 </div>
 
                 {/* Right section */}
