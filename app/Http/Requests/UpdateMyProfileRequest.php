@@ -26,9 +26,9 @@ class UpdateMyProfileRequest extends FormRequest
 
         return [
             // Personal info
-            'first_name' => 'nullable|string|max:100',
-            'middle_name' => 'nullable|string|max:100',
-            'last_name' => 'nullable|string|max:100',
+            'first_name' => ['nullable', 'string', 'max:100', 'regex:/^[^\d]*$/u'],
+            'middle_name' => ['nullable', 'string', 'max:100', 'regex:/^[^\d]*$/u'],
+            'last_name' => ['nullable', 'string', 'max:100', 'regex:/^[^\d]*$/u'],
             'phone' => 'nullable|string|max:20',
 
             // Address
@@ -38,6 +38,7 @@ class UpdateMyProfileRequest extends FormRequest
             'state' => 'nullable|string|max:100',
             'postal_code' => 'nullable|string|max:20',
             'country' => 'nullable|string|max:100',
+            'birthdate' => 'nullable|date',
 
             // User credentials
             'email' => [
@@ -61,12 +62,16 @@ class UpdateMyProfileRequest extends FormRequest
             'first_name.max' => 'The first name cannot exceed 100 characters.',
             'last_name.max' => 'The last name cannot exceed 100 characters.',
             'middle_name.max' => 'The middle name cannot exceed 100 characters.',
+            'first_name.regex' => 'The first name must not contain numbers.',
+            'middle_name.regex' => 'The middle name must not contain numbers.',
+            'last_name.regex' => 'The last name must not contain numbers.',
             'address_line_1.max' => 'Address line 1 cannot exceed 255 characters.',
             'address_line_2.max' => 'Address line 2 cannot exceed 255 characters.',
             'city.max' => 'The city cannot exceed 100 characters.',
             'state.max' => 'The state cannot exceed 100 characters.',
             'postal_code.max' => 'The postal code cannot exceed 20 characters.',
             'country.max' => 'The country cannot exceed 100 characters.',
+            'birthdate.date' => 'Birthdate must be a valid date.',
             'phone.max' => 'The phone number cannot exceed 20 characters.',
             'email.email' => 'Please provide a valid email address.',
             'email.unique' => 'This email is already taken.',
@@ -74,4 +79,3 @@ class UpdateMyProfileRequest extends FormRequest
         ];
     }
 }
-

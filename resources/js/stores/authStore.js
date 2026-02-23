@@ -18,6 +18,33 @@ export const useAuthStore = create((set, get) => ({
     });
   },
 
+  updateUserProfile: (profileData) => {
+    if (!profileData) return;
+
+    set((state) => {
+      if (!state.user) return state;
+
+      if (state.user?.user && typeof state.user.user === "object") {
+        return {
+          user: {
+            ...state.user,
+            user: {
+              ...state.user.user,
+              ...profileData,
+            },
+          },
+        };
+      }
+
+      return {
+        user: {
+          ...state.user,
+          ...profileData,
+        },
+      };
+    });
+  },
+
   // ------------------------
   // INITIALIZE SESSION
   // Called ONCE on app boot
