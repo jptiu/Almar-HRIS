@@ -178,4 +178,130 @@ class DocumentController extends Controller
             ['Content-Type' => $document->mime_type]
         );
     }
+
+    // ==========================
+    // Documents Categorized by Type
+    // ==========================
+
+    /**
+     * Get current user's documents categorized by document type.
+     * Endpoint: GET /api/me/documents/by-type
+     * Returns all document types, including those with count = 0
+     */
+    public function myDocumentsByType(Request $request)
+    {
+        $employee = $request->user()->employee;
+
+        // Get all active document types
+        $documentTypes = DocumentType::where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
+
+        // Get documents for this employee
+        $documents = EmployeeDocument::where('employee_id', $employee->id)
+            ->with(['uploader:id,email'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Group documents by document type ID
+        $documentsByType = $documents->groupBy('document_type_id');
+
+        // Build response including all document types
+        $categories = $documentTypes->map(function ($documentType) use ($documentsByType) {
+            $docs = $documentsByType->get($documentType->id, collect());
+
+            return [
+                'document_type' => [
+                    'id' => $documentType->id,
+                    'slug' => $documentType->slug,
+                    'name' => $documentType->name,
+                    'description' => $documentType->description,
+                ],
+                'count' => $docs->count(),
+                'documents' => $docs->map(function ($doc) {
+                    DocumentHelper::appendFormattedSize($doc);
+                    return [
+                        'id' => $doc->id,
+                        'file_name' => $doc->file_name,
+                        'file_path' => $doc->file_path,
+                        'file_size' => $doc->file_size,
+                        'formatted_size' => $doc->formatted_size,
+                        'mime_type' => $doc->mime_type,
+                        'description' => $doc->description,
+                        'uploaded_by' => $doc->uploaded_by,
+                        'uploader_email' => $doc->uploader->email ?? null,
+                        'created_at' => $doc->created_at,
+                        'updated_at' => $doc->updated_at,
+                    ];
+                })->values(),
+            ];
+        })->values();
+
+        return $this->success(['categories' => $categories], 'Documents retrieved successfully.');
+    }
+
+    /**
+     * Get all documents (or filtered by employee) categorized by document type.
+     * Endpoint: GET /api/documents/by-type
+     * Optional: ?employee_id=123 to filter by specific employee
+     * Returns all document types, including those with count = 0
+     */
+    public function documentsByType(Request $request)
+    {
+        // Get all active document types
+        $documentTypes = DocumentType::where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
+
+        // Build query for documents
+        $query = EmployeeDocument::with(['employee:id,first_name,last_name,middle_name', 'uploader:id,email']);
+
+        // Optional filter by employee_id
+        if ($request->has('employee_id')) {
+            $query->where('employee_id', $request->employee_id);
+        }
+
+        $documents = $query->orderBy('created_at', 'desc')->get();
+
+        // Group documents by document type ID
+        $documentsByType = $documents->groupBy('document_type_id');
+
+        // Build response including all document types
+        $categories = $documentTypes->map(function ($documentType) use ($documentsByType) {
+            $docs = $documentsByType->get($documentType->id, collect());
+
+            return [
+                'document_type' => [
+                    'id' => $documentType->id,
+                    'slug' => $documentType->slug,
+                    'name' => $documentType->name,
+                    'description' => $documentType->description,
+                ],
+                'count' => $docs->count(),
+                'total_file_size' => $docs->sum('file_size'),
+                'documents' => $docs->map(function ($doc) {
+                    DocumentHelper::appendFormattedSize($doc);
+                    return [
+                        'id' => $doc->id,
+                        'employee_id' => $doc->employee_id,
+                        'employee_name' => $doc->employee 
+                            ? trim($doc->employee->first_name . ' ' . ($doc->employee->middle_name ? $doc->employee->middle_name . ' ' : '') . $doc->employee->last_name)
+                            : null,
+                        'file_name' => $doc->file_name,
+                        'file_path' => $doc->file_path,
+                        'file_size' => $doc->file_size,
+                        'formatted_size' => $doc->formatted_size,
+                        'mime_type' => $doc->mime_type,
+                        'description' => $doc->description,
+                        'uploaded_by' => $doc->uploaded_by,
+                        'uploader_email' => $doc->uploader->email ?? null,
+                        'created_at' => $doc->created_at,
+                        'updated_at' => $doc->updated_at,
+                    ];
+                })->values(),
+            ];
+        })->values();
+
+        return $this->success(['categories' => $categories], 'Documents retrieved successfully.');
+    }
 }

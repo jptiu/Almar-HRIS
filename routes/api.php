@@ -45,6 +45,7 @@ Route::middleware('auth')->group(function () {
             // My Documents
             Route::prefix('documents')->group(function () {
                 Route::get('/', [DocumentController::class, 'myDocuments']);
+                Route::get('/by-type', [DocumentController::class, 'myDocumentsByType']);
                 Route::post('/', [DocumentController::class, 'storeMyDocument']);
                 Route::get('{document}', [DocumentController::class, 'showMyDocument']);
                 Route::put('{document}', [DocumentController::class, 'updateMyDocument']);
@@ -157,6 +158,9 @@ Route::middleware('auth')->group(function () {
 
             // List all documents (filterable)
             Route::get('/', [DocumentController::class, 'index']);
+
+            // Documents categorized by document type
+            Route::get('/by-type', [DocumentController::class, 'documentsByType']);
 
             // View specific document
             Route::get('{document}', [DocumentController::class, 'show']);
