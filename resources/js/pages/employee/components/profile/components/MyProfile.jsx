@@ -188,7 +188,7 @@ export const MyProfile = () => {
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="grid grid-cols-1 gap-4">
+                            <div className="grid grid-cols-1 gap-4 max-h-100 overflow-y-auto">
                                 {leaveCredits?.map((credit, index) => (
                                     <LeaveCreditCard
                                         key={index}

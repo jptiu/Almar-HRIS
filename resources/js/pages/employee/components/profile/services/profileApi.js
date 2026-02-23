@@ -1,4 +1,13 @@
 import axiosInstance from "@/services/axiosInstance";
+import dayjs from "dayjs";
+import { formatDisplayDate } from "@/helpers";
+
+const normalizeDateForInput = (value) => {
+  if (!value) return "";
+
+  const date = dayjs(value);
+  return date.isValid() ? date.format("YYYY-MM-DD") : "";
+};
 
 const mapMeResponseToProfile = (mePayload, creditsPayload = []) => {
   const user = mePayload?.user || {};
@@ -9,28 +18,23 @@ const mapMeResponseToProfile = (mePayload, creditsPayload = []) => {
       lastName: user.last_name || "",
       email: user.email || "",
       phoneNumber: user.phone || "",
-      address: [
-        user.address_line_1,
-        user.address_line_2,
-        user.city,
-        user.state,
-        user.postal_code,
-        user.country,
-      ]
-        .filter(Boolean)
-        .join(", "),
-      birthday: user.birthdate || "",
+      address_line_1: user.address_line_1 || "",
+      address_line_2: user.address_line_2 || "",
+      city: user.city || "",
+      state: user.state || "",
+      birthday: formatDisplayDate(user.birthdate),
+      birthdayRaw: normalizeDateForInput(user.birthdate),
     },
     jobInfo: {
       employeeId: user.employee_id || "",
       department: user.department || "",
       position: user.position || "",
       employmentStatus: user.employee_status || "",
-      hireDate: user.hire_date || "",
-      supervisor: "N/A",
+      hireDate: formatDisplayDate(user.hire_date),
+      supervisor: user.supervisor || "N/A",
     },
     leaveCredits: (creditsPayload || []).map((credit) => ({
-      type: credit.leave_type_name,
+      type: credit.leave_type_name || "",
       used: Number(credit.used_days || 0),
       remaining: Number(credit.remaining_days || 0),
       total: Number(credit.total_days || 0),
@@ -39,23 +43,16 @@ const mapMeResponseToProfile = (mePayload, creditsPayload = []) => {
 };
 
 const mapProfilePayloadToApi = (data) => {
-  const addressParts = String(data.address || "")
-    .split(",")
-    .map((part) => part.trim())
-    .filter(Boolean);
-
   return {
     first_name: data.firstName,
     last_name: data.lastName,
     email: data.email,
     phone: data.phoneNumber,
     birthdate: data.birthday,
-    address_line_1: addressParts[0] || "",
-    address_line_2: addressParts[1] || "",
-    city: addressParts[2] || "",
-    state: addressParts[3] || "",
-    postal_code: addressParts[4] || "",
-    country: addressParts[5] || "",
+    address_line_1: data.address_line_1 || "",
+    address_line_2: data.address_line_2 || "",
+    city: data.city || "",
+    state: data.state || "",
   };
 };
 

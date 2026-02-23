@@ -4,8 +4,6 @@ import { PROFILE_QUERY_KEY } from "./useFetchProfileQuery";
 import toast from "react-hot-toast";
 import { useAuthStore } from "@/stores";
 
-// Hook to update personal information
-// Uses React Query for mutation and cache invalidation
 export const useUpdateProfileMutation = () => {
   const queryClient = useQueryClient();
   const updateUserProfile = useAuthStore((state) => state.updateUserProfile);

@@ -7,6 +7,7 @@ import {
     CardTitle,
     CardContent,
     InputField,
+    CardDescription,
 } from "@/components/ui";
 import {
     Select,
@@ -16,7 +17,7 @@ import {
     SelectValue,
 } from "@/components/ui/Select";
 import { ActionsMenu } from "@/components/common";
-import { FileText, Trash2, Download } from "lucide-react";
+import { FileText, Trash2, Download, User, Folder } from "lucide-react";
 import dayjs from "dayjs";
 import {
     useFetchMyDocumentsQuery,
@@ -94,13 +95,12 @@ export const MyDocumentsTable = ({ setDeleteTarget }) => {
         <Card>
             <CardHeader>
                 <div className="flex items-center gap-2">
-                    <div>
-                        <CardTitle>All Documents</CardTitle>
-                        <p className="text-sm text-text-tertiary mt-0.5 mb-4">
-                            Your uploaded documents for HR records
-                        </p>
-                    </div>
+                    <Folder className="h-5 w-5 text-brand-primary" />
+                    <CardTitle className="text-lg font-semibold">
+                        All Documents
+                    </CardTitle>
                 </div>
+                <CardDescription className={"mb-8"}>Your uploaded documents for HR records</CardDescription>
 
                 {/* Search bar */}
                 <div className="flex items-center gap-3 flex-wrap justify-end">
@@ -134,9 +134,7 @@ export const MyDocumentsTable = ({ setDeleteTarget }) => {
                                 <SelectValue placeholder="All Types" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">
-                                    All Types
-                                </SelectItem>
+                                <SelectItem value="all">All Types</SelectItem>
                                 {documentTypesData?.document_types?.map(
                                     (type) => (
                                         <SelectItem

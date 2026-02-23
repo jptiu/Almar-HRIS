@@ -4,3 +4,4 @@ export * from "./getStatusVariant";
 export * from "./formatStatus";
 export * from "./getRelativeDate";
 export * from "./getDaysLeft";
+export * from "./formatDisplayDate";
