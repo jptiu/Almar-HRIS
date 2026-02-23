@@ -12,6 +12,8 @@ export function getStatusVariant(type) {
     active: "success",
     on_leave: "warning",
     terminated: "danger",
+    probationary: "warning",
+    permanent: "success"
   }
 
   return map[type?.toLowerCase()] || "default"

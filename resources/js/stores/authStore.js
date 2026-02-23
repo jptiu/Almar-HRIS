@@ -1,12 +1,10 @@
 import { create } from "zustand";
 import axiosInstance from "@/services/axiosInstance";
-import { switchRoleApi } from "@/services/authService";
 
 export const useAuthStore = create((set, get) => ({
   user: null,
   isLoading: true,
   isAuthenticated: false,
-  isSwitchingRole: false,
 
   setUser: (userData) => {
     if (!userData) return;
@@ -17,6 +15,33 @@ export const useAuthStore = create((set, get) => ({
       },
       isAuthenticated: true,
       isLoading: false,
+    });
+  },
+
+  updateUserProfile: (profileData) => {
+    if (!profileData) return;
+
+    set((state) => {
+      if (!state.user) return state;
+
+      if (state.user?.user && typeof state.user.user === "object") {
+        return {
+          user: {
+            ...state.user,
+            user: {
+              ...state.user.user,
+              ...profileData,
+            },
+          },
+        };
+      }
+
+      return {
+        user: {
+          ...state.user,
+          ...profileData,
+        },
+      };
     });
   },
 
@@ -46,30 +71,6 @@ export const useAuthStore = create((set, get) => ({
         isAuthenticated: false,
         isLoading: false,
       });
-    }
-  },
-
-  // ------------------------
-  // SWITCH ROLE
-  // ------------------------
-  switchRole: async (role) => {
-    try {
-      set({ isSwitchingRole: true });
-      const response = await switchRoleApi(role);
-      const newActiveRole = response.data?.active_role;
-
-      set((state) => ({
-        user: {
-          ...state.user,
-          active_role: newActiveRole,
-        },
-        isSwitchingRole: false,
-      }));
-
-      return newActiveRole;
-    } catch (error) {
-      set({ isSwitchingRole: false });
-      throw error;
     }
   },
 

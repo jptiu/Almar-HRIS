@@ -2,8 +2,8 @@
 import { useState, useTransition } from "react";
 import { Menu, Bell, Search } from "lucide-react";
 import { useNotificationStore, useAuthStore, useUIStore } from "@/stores";
-import NotificationPanel from "../NotificationPanel";
-import { useMediaQuery } from "../../hooks/useMediaQuery";
+import { NotificationPanel } from "../common";
+import { useMediaQuery } from "@/hooks";
 
 const Topbar = () => {
     const [isPending, startTransition] = useTransition();
@@ -49,9 +49,9 @@ const Topbar = () => {
                             <Menu className="w-5 h-5 text-gray-700" />
                         </button>
                     )}
-                    <h1 className="text-xl font-semibold text-gray-800">
+                    {/* <h1 className="text-xl font-semibold text-gray-800">
                         Dashboard
-                    </h1>
+                    </h1> */}
                 </div>
 
                 {/* Right section */}

@@ -34,6 +34,6 @@ trait HasSearchFilter
                 $request->query('sort_field', 'created_at'),
                 $request->query('sort_order', 'desc')
             )
-            ->paginate($request->query('per_page', 20));
+            ->paginate($request->query('per_page', 10));
     }
 }

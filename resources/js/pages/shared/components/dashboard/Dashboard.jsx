@@ -1,5 +1,5 @@
 import { useAuthStore } from "@/stores";
-import { useGreeting } from "../../../../hooks/useGreeting";
+import { useGreeting } from "@/hooks";
 import { Users, UserCheck, CalendarOff, TrendingUp } from "lucide-react";
 import { StatCard } from "@/components/ui";
 import {
@@ -8,9 +8,7 @@ import {
     PendingLeaveRequests,
     RecentEmployees,
 } from ".";
-import { EmployeesBirthdayCard } from "@/components/common";
-import { LeaveCalendar } from "@/components/common";
-import { employeesBirthday } from "@/data/mockData";
+import { EmployeesBirthdayCard, LeaveCalendar } from "@/components/widgets";
 
 export const Dashboard = () => {
     const greeting = useGreeting();
@@ -21,7 +19,7 @@ export const Dashboard = () => {
             {/* Welcome Header */}
             <div>
                 <h1 className="text-2xl font-bold text-text-dark mb-2">
-                    {greeting}, {user?.user?.full_name || "user"}!
+                    {greeting}, {user?.user?.first_name || "user"}!
                 </h1>
                 <p className="text-text-tertiary">
                     Here's what's happening with your company today.
@@ -32,29 +30,33 @@ export const Dashboard = () => {
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <StatCard
                     title="Total Employees"
-                    value={14}
+                    value={476}
                     icon={Users}
-                    trend={{ value: 12, isPositive: true }}
+                    trend={{ value: 4.2, isPositive: true }}
                     subtitle="vs last month"
                     variant="default"
                 />
                 <StatCard
                     title="Active Today"
-                    value={6}
+                    value={438}
                     icon={UserCheck}
+                    trend={{ value: 1.8, isPositive: true }}
+                    subtitle="vs yesterday"
                     variant="success"
                 />
                 <StatCard
                     title="On Leave"
-                    value={1}
+                    value={28}
                     icon={CalendarOff}
+                    trend={{ value: 0.5, isPositive: false }}
+                    subtitle="vs yesterday"
                     variant="warning"
                 />
                 <StatCard
                     title="Attendance Rate"
-                    value={`94.5%`}
+                    value="92%"
                     icon={TrendingUp}
-                    trend={{ value: 2.5, isPositive: true }}
+                    trend={{ value: 1.2, isPositive: true }}
                     subtitle="this week"
                     variant="info"
                 />
@@ -64,10 +66,7 @@ export const Dashboard = () => {
                 <EmployeeChart />
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-6">
-                <EmployeesBirthdayCard
-                    today={employeesBirthday.today}
-                    upcoming={employeesBirthday.upcoming}
-                />
+                <EmployeesBirthdayCard />
                 <LeaveCalendar />
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

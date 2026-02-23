@@ -5,7 +5,6 @@ import { Toaster } from "react-hot-toast";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import Home from "./pages/Home";
-import TestLogin from "./pages/TestLogin";
 import NotFound from "./pages/NotFound";
 
 import {
@@ -14,7 +13,7 @@ import {
     adminRoutes,
     employeeRoutes,
 } from "./routes";
-import AppLoader from "./components/AppLoader";
+import { AppLoader } from "./components/common";
 import RoleBasedRoute from "./components/layouts/RoleBasedRoute";
 import DashboardLayout from "./components/layouts/DashboardLayout";
 
@@ -34,7 +33,6 @@ function App() {
                     <Routes>
                         {/* Public */}
                         <Route path="/" element={<Home />} />
-                        <Route path="/test-login" element={<TestLogin />} />
 
                         {/* Protected Sections */}
                         <Route element={<ProtectedRoutes />}>

@@ -1,7 +1,7 @@
 // resources/js/components/LoadingSpinner.jsx
-import { cn } from "../utils/cn";
+import { cn } from "@/lib/utils";
 
-const LoadingSpinner = ({ size = "md", className = "" }) => {
+export const LoadingSpinner = ({ size = "md", className = "" }) => {
     const sizes = {
         sm: "w-4 h-4 border-2",
         md: "w-8 h-8 border-3",
@@ -31,5 +31,3 @@ export const LoadingOverlay = ({ message = "Loading..." }) => {
         </div>
     );
 };
-
-export default LoadingSpinner;

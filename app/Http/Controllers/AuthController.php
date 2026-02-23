@@ -148,6 +148,7 @@ class AuthController extends Controller
                     'middle_name',
                     'last_name',
                     'phone',
+                    'birthdate',
                     'address_line_1',
                     'address_line_2',
                     'city',

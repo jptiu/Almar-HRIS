@@ -2,8 +2,9 @@
 import { useEffect, useCallback } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuthStore, useUIStore } from "@/stores";
-import { navigationConfig } from "../../config/navigationConfig";
-import { useMediaQuery } from "../../hooks/useMediaQuery";
+import { useSwitchRoleMutation } from "@/pages/auth/hooks";
+import { navigationConfig } from "@/config/navigationConfig";
+import { useMediaQuery } from "@/hooks";
 import { cn } from "../../utils/cn";
 import SidebarProfileFooter from "./SidebarProfileFooter";
 
@@ -14,8 +15,6 @@ const Sidebar = ({ onLogout }) => {
 
     const role = useAuthStore((state) => state.user?.active_role) || "employee";
     const user = useAuthStore((state) => state.user);
-    const switchRole = useAuthStore((state) => state.switchRole);
-    const isSwitchingRole = useAuthStore((state) => state.isSwitchingRole);
     const navigate = useNavigate();
     const isMobile = useMediaQuery("(max-width: 768px)");
 
@@ -40,17 +39,18 @@ const Sidebar = ({ onLogout }) => {
         return roleRouteMap[roleName] || "/employee/dashboard";
     };
 
-    const handleSwitchRole = useCallback(
-        async (newRole) => {
-            if (newRole === role) return;
-            try {
-                const activeRole = await switchRole(newRole);
-                navigate(getRoleDashboardPath(activeRole));
-            } catch (error) {
-                console.error("Failed to switch role:", error);
-            }
+    const switchRoleMutation = useSwitchRoleMutation({
+        onSuccess: (activeRole) => {
+            navigate(getRoleDashboardPath(activeRole));
         },
-        [role, switchRole, navigate],
+    });
+
+    const handleSwitchRole = useCallback(
+        (newRole) => {
+            if (newRole === role) return;
+            switchRoleMutation.mutate(newRole);
+        },
+        [role, switchRoleMutation],
     );
 
     const isCollapsedDesktop = sidebarCollapsed && !isMobile && !mobileMenuOpen;
@@ -169,7 +169,7 @@ const Sidebar = ({ onLogout }) => {
                 sidebarCollapsed={sidebarCollapsed}
                 mobileMenuOpen={mobileMenuOpen}
                 onSwitchRole={handleSwitchRole}
-                isSwitchingRole={isSwitchingRole}
+                isSwitchingRole={switchRoleMutation.isPending}
                 onLogout={onLogout}
             />
         </div>

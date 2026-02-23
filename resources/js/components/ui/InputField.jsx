@@ -3,29 +3,29 @@ import React from "react";
 const sizeVariants = {
     xs: {
         container: "px-3 py-1.5 rounded-lg",
-        label: "text-[9px] mb-0.5",
-        input: "text-xs",
+        label: "text-[11px] mb-0.5",
+        input: "text-[14px]",
         icon: 14,
         iconRight: "right-3",
     },
     sm: {
         container: "px-4 py-2 rounded-xl",
-        label: "text-[10px] mb-1",
-        input: "text-sm",
+        label: "text-[12px] mb-1",
+        input: "text-[15px]",
         icon: 16,
         iconRight: "right-4",
     },
     md: {
         container: "px-6 py-3 rounded-2xl",
-        label: "text-xs mb-1",
-        input: "text-base",
+        label: "text-[13px] mb-1",
+        input: "text-[16px]",
         icon: 18,
         iconRight: "right-5",
     },
     lg: {
         container: "px-8 py-4 rounded-2xl",
-        label: "text-sm mb-2",
-        input: "text-lg",
+        label: "text-[14px] mb-2",
+        input: "text-[17px]",
         icon: 20,
         iconRight: "right-6",
     },
@@ -71,16 +71,18 @@ export default function InputField({
     showPassword,
     togglePassword,
     size = "md",
-    variant = "dark", // 👈 default theme
+    variant = "light",
+    className = "",
 }) {
     const sizeConfig = sizeVariants[size] || sizeVariants.md;
-    const themeConfig = themeVariants[variant] || themeVariants.dark;
+    const themeConfig = themeVariants[variant] || themeVariants.light;
 
     return (
         <div
             className={`group relative transition-all duration-300 ease-out
             ${sizeConfig.container}
-            ${themeConfig.container}`}
+            ${themeConfig.container}
+            ${className}`}
         >
             {label && (
                 <label

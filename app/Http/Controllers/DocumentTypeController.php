@@ -17,6 +17,7 @@ class DocumentTypeController extends Controller
             ->get()
             ->map(function ($type) {
                 return [
+                    'id' => $type->id,
                     'slug' => $type->slug,
                     'name' => $type->name,
                     'description' => $type->description,

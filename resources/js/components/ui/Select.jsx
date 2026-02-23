@@ -4,6 +4,58 @@ import { Select as SelectPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
 
+const sizeVariants = {
+    xs: {
+        container: "px-3 py-1.5 rounded-lg",
+        label: "text-[9px] mb-0.5",
+        value: "text-xs",
+    },
+    sm: {
+        container: "px-4 py-2 rounded-xl",
+        label: "text-[10px] mb-1",
+        value: "text-sm",
+    },
+    md: {
+        container: "px-6 py-3 rounded-2xl",
+        label: "text-xs mb-1",
+        value: "text-base",
+    },
+    lg: {
+        container: "px-8 py-4 rounded-2xl",
+        label: "text-sm mb-2",
+        value: "text-lg",
+    },
+};
+
+const themeVariants = {
+    dark: {
+        container: `
+            bg-surface-card
+            border border-(--color-border-default)
+            hover:border-(--color-border-hover)
+            hover:bg-(--color-surface-input-hover)
+            focus-within:border-(--color-border-focus)
+            focus-within:shadow-[0_0_0_1px_var(--color-focus-ring),0_8px_30px_var(--color-shadow-focus)]
+        `,
+        label: "text-text-tertiary",
+        value: "text-text-primary data-placeholder:text-text-muted",
+        icon: "text-text-tertiary group-focus-within:text-info",
+    },
+    light: {
+        container: `
+            bg-white
+            border border-gray-300
+            hover:border-gray-400
+            hover:bg-gray-50
+            focus-within:border-blue-500
+            focus-within:shadow-[0_0_0_2px_rgba(59,130,246,0.25)]
+        `,
+        label: "text-gray-500",
+        value: "text-gray-900 data-placeholder:text-gray-400",
+        icon: "text-gray-400 group-focus-within:text-blue-500",
+    },
+};
+
 function Select({
   ...props
 }) {
@@ -24,16 +76,72 @@ function SelectValue({
 
 function SelectTrigger({
   className,
-  size = "default",
+  size = "md",
+  label,
+  variant = "light",
   children,
   ...props
 }) {
+  const sizeConfig = sizeVariants[size] || sizeVariants.md;
+  const themeConfig = themeVariants[variant] || themeVariants.light;
+
+  // Map size names for backward compatibility with data-size attribute
+  const sizeMap = {
+    xs: "sm",
+    sm: "sm",
+    md: "default",
+    lg: "lg",
+  };
+  const dataSize = sizeMap[size] || "default";
+
+  const triggerContent = (
+    <>
+      <SelectPrimitive.Icon asChild>
+        <ChevronDownIcon className={cn("size-5 opacity-50 transition", themeConfig.icon)} />
+      </SelectPrimitive.Icon>
+    </>
+  );
+
+  // When label is provided, use InputField-style container
+  if (label) {
+    return (
+      <div
+        className={cn(
+          "group relative transition-all duration-300 ease-out w-fit",
+          sizeConfig.container,
+          themeConfig.container
+        )}
+      >
+        <label
+          className={cn("block tracking-wide", sizeConfig.label, themeConfig.label)}
+        >
+          {label}
+        </label>
+        <SelectPrimitive.Trigger
+          data-slot="select-trigger"
+          data-size={dataSize}
+          className={cn(
+            "flex w-full items-center justify-between gap-2 bg-transparent border-none outline-none focus:outline-none focus:ring-0 whitespace-nowrap disabled:cursor-not-allowed disabled:opacity-50 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+            sizeConfig.value,
+            themeConfig.value,
+            className
+          )}
+          {...props}
+        >
+          {children}
+          {triggerContent}
+        </SelectPrimitive.Trigger>
+      </div>
+    );
+  }
+
+  // Original styling when no label (backward compatible)
   return (
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
-      data-size={size}
+      data-size={dataSize}
       className={cn(
-        "border-input data-placeholder:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 flex w-fit items-center justify-between gap-2 rounded-md border bg-transparent px-3 py-2 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-9 data-[size=sm]:h-8 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "border-input data-placeholder:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 flex w-fit items-center justify-between gap-2 rounded-md border bg-transparent px-3 py-2 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-9 data-[size=sm]:h-8 data-[size=lg]:h-11 data-[size=xl]:h-12 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}>
