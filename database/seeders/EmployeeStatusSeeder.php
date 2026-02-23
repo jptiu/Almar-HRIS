@@ -26,6 +26,10 @@ class EmployeeStatusSeeder extends Seeder
                 'description' => 'Contract-based employee',
             ],
             [
+                'name' => 'Resign',
+                'description' => 'Employee who has resigned from the company',
+            ],
+            [
                 'name' => 'Terminated',
                 'description' => 'Former employee whose contract has ended',
             ],
