@@ -2,7 +2,7 @@
 import { X, Check, Trash2, Bell } from "lucide-react";
 import { useUIStore, useNotificationStore } from "@/stores";
 
-const NotificationPanel = () => {
+export const NotificationPanel = () => {
     const notifications = useNotificationStore((state) => state.notifications);
     const markAsRead = useNotificationStore((state) => state.markAsRead);
     const markAllAsRead = useNotificationStore((state) => state.markAllAsRead);
@@ -152,5 +152,3 @@ const NotificationPanel = () => {
         </div>
     );
 };
-
-export default NotificationPanel;

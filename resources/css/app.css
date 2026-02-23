@@ -99,6 +99,11 @@
     --chart-3: #1447e6;
     --chart-4: #165dfc;
     --chart-5: #2b7fff;
+    --chart-6: #3b8cff;
+    --chart-7: #4c9cff;
+    --chart-8: #5ca9ff;
+    --chart-9: #6cb5ff;
+    --chart-10: #7dbfff;
     --sidebar: oklch(0.985 0 0);
     --sidebar-foreground: oklch(0.145 0 0);
     --sidebar-primary: oklch(0.205 0 0);

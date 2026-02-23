@@ -35,7 +35,6 @@ class EmployeeDocument extends Model
         'employee.first_name',
         'employee.last_name',
         'documentType.name',
-        'uploader.name',
         'uploader.email',
     ];
 

@@ -19,6 +19,7 @@ import {
   CreditCard,
   MegaphoneIcon,
   Megaphone,
+  UserCircle2,
 } from 'lucide-react';
 
 /**
@@ -130,14 +131,24 @@ export const navigationConfig = {
       path: '/employee/dashboard',
     },
     {
-      label: 'My Profile',
-      icon: User,
-      path: '/employee/profile',
+      label: 'Time Tracking',
+      icon: Clock,
+      path: '/employee/time-tracking',
     },
     {
-      label: 'Leave Requests',
-      icon: CalendarDays,
-      path: '/employee/leave-requests',
+      label: 'Leaves',
+      icon: Calendar,
+      path: '/employee/leaves',
+    },
+    {
+      label: 'Requests',
+      icon: ClipboardList,
+      path: '/employee/requests',
+    },
+    {
+      label: 'Concerns',
+      icon: Info,
+      path: '/employee/concerns',
     },
     {
       label: 'Payslips',
@@ -145,9 +156,14 @@ export const navigationConfig = {
       path: '/employee/payslips',
     },
     {
-      label: 'Team Directory',
-      icon: UsersRound,
-      path: '/employee/team-directory',
+      label: 'My Documents',
+      icon: FileText,
+      path: '/employee/my-documents',
+    },
+    {
+      label: 'My Profile',
+      icon: UserCircle2,
+      path: '/employee/my-profile',
     },
   ],
 };

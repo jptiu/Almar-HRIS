@@ -1,9 +1,9 @@
 // resources/js/components/Breadcrumb.jsx
 import { ChevronRight, Home } from "lucide-react";
 import { Link } from "react-router-dom";
-import useUIStore from "../stores/uiStore";
+import { useUIStore } from "@/stores";
 
-const Breadcrumb = () => {
+export const Breadcrumb = () => {
     const breadcrumbs = useUIStore((state) => state.breadcrumbs);
 
     if (!breadcrumbs || breadcrumbs.length === 0) return null;
@@ -37,5 +37,3 @@ const Breadcrumb = () => {
         </nav>
     );
 };
-
-export default Breadcrumb;

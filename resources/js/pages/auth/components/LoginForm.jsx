@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { Mail, Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
 
-import InputField from "./ui/InputField";
-import { useLoginMutation } from "./hooks";
+import { InputField } from "@/components/ui";
+import { useLoginMutation } from "../hooks";
 
-export default function LoginForm() {
+export const LoginForm = () => {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -53,6 +53,7 @@ export default function LoginForm() {
                         onChange={(e) => setEmail(e.target.value)}
                         rightIcon={Mail}
                         size="xs"
+                        variant="dark"
                     />
 
                     <InputField
@@ -66,6 +67,7 @@ export default function LoginForm() {
                         togglePassword={() => setShowPassword((prev) => !prev)}
                         rightIcon={showPassword ? EyeOff : Eye}
                         size="xs"
+                        variant="dark"
                     />
 
                     <div className="flex gap-4 pt-6">

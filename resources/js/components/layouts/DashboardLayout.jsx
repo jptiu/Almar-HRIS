@@ -5,10 +5,10 @@ import { useUIStore } from "@/stores";
 import Topbar from "./Topbar";
 import Sidebar from "./Sidebar";
 import LogoutConfirmModal from "./LogoutConfirmModal";
-import { useLogoutMutation } from "../hooks/useLogoutMutation";
-import { useMediaQuery } from "../../hooks/useMediaQuery";
+import { useLogoutMutation } from "@/pages/auth/hooks/useLogoutMutation";
+import { useMediaQuery } from "@/hooks";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { cn } from "../../utils/cn";
+import { cn } from "@/lib/utils";
 
 const DashboardLayout = () => {
     const sidebarCollapsed = useUIStore((state) => state.sidebarCollapsed);

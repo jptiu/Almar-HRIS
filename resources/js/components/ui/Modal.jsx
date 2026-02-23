@@ -44,23 +44,22 @@ const Modal = ({
             {/* Modal */}
             <div
                 className={cn(
-                    "relative w-full bg-white rounded-xl shadow-xl animate-in fade-in zoom-in duration-200",
+                    "relative w-full bg-white rounded-2xl shadow-xl animate-in fade-in zoom-in duration-200",
                     sizes[size],
                 )}
             >
-                {(title || showCloseButton) && (
-                    <div className="flex items-center justify-between p-6 border-b">
-                        {title && (
-                            <h2 className="text-2xl font-semibold">{title}</h2>
-                        )}
-                        {showCloseButton && (
-                            <button
-                                onClick={onClose}
-                                className="ml-auto p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
-                            >
-                                <X className="w-5 h-5" />
-                            </button>
-                        )}
+                {showCloseButton && (
+                    <button
+                        onClick={onClose}
+                        className="absolute -top-4 -right-4 bg-gray-800 text-white rounded-full p-2 hover:bg-gray-500 transition-colors cursor-pointer shadow-sm z-10"
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
+                )}
+
+                {title && (
+                    <div className="px-6 pt-6">
+                        <h2 className="text-2xl font-bold">{title}</h2>
                     </div>
                 )}
 
@@ -71,12 +70,7 @@ const Modal = ({
 };
 
 export const ModalFooter = ({ children, className = "" }) => (
-    <div
-        className={cn(
-            "flex items-center justify-end gap-3 pt-4",
-            className,
-        )}
-    >
+    <div className={cn("flex items-center justify-end gap-3 pt-4", className)}>
         {children}
     </div>
 );
