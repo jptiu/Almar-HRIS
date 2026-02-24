@@ -32,10 +32,7 @@ class EmployeeDocument extends Model
     public array $searchable = [
         'file_name',
         'description',
-        'employee.first_name',
-        'employee.last_name',
         'documentType.name',
-        'uploader.email',
     ];
 
     // 🔥 Filterable fields
