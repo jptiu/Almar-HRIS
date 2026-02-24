@@ -15,6 +15,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\LeaveTypeController;
 use App\Http\Controllers\RequestController;
+use App\Http\Controllers\AttendanceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,6 +43,11 @@ Route::middleware('auth')->group(function () {
 
         // My Documents
         Route::prefix('documents')->group(function () {
+            Route::prefix('types')->group(function () {
+                Route::get('/', [DocumentController::class, 'myDocumentsByTypes']);
+                Route::get('{documentType}', [DocumentController::class, 'myDocumentsByTypeId']);
+            });
+
             Route::get('/', [DocumentController::class, 'myDocuments']);
             Route::post('/', [DocumentController::class, 'storeMyDocument']);
             Route::get('{document}', [DocumentController::class, 'showMyDocument']);
@@ -56,6 +62,14 @@ Route::middleware('auth')->group(function () {
             Route::get('/requests', [LeaveController::class, 'myLeaveRequests']);
             Route::post('/requests', [LeaveController::class, 'submitLeaveRequest']);
             Route::put('/requests/{leaveRequest}', [LeaveController::class, 'cancelMyLeaveRequest']);
+        });
+
+        // My Attendance (Employee Self-Service)
+        Route::prefix('attendance')->group(function () {
+            Route::get('/today', [AttendanceController::class, 'todayAttendance']);
+            Route::post('/clock-in', [AttendanceController::class, 'clockIn']);
+            Route::post('/clock-out', [AttendanceController::class, 'clockOut']);
+            Route::get('/', [AttendanceController::class, 'myAttendance']);
         });
     });
 
@@ -122,12 +136,34 @@ Route::middleware('auth')->group(function () {
 
 
         Route::prefix('employees')->group(function () {
+
+            Route::prefix('documents')->group(function () {
+
+                // List all documents (filterable)
+                Route::get('/', [DocumentController::class, 'index']);
+
+                // View specific document
+                Route::get('{document}', [DocumentController::class, 'show']);
+
+                // Download
+                Route::get('{document}/download', [DocumentController::class, 'download']);
+            });
+
             Route::get('leave-credits', [LeaveController::class, 'index']); // index all employees leave credits
 
             // Specific employee leave credits
             Route::prefix('{employee}')->group(function () {
+
+                Route::prefix('documents')->group(function () {
+                    Route::prefix('types')->group(function () {
+                        Route::get('/', [DocumentController::class, 'documentsByTypes']);
+                        Route::get('{documentType}', [DocumentController::class, 'documentsByTypeId']);
+                    });
+                });
+                
                 Route::get('/leave-credits', [LeaveController::class, 'show']);    // show employee leave credits
                 Route::patch('/leave-credits', [LeaveController::class, 'adjustadLeaveCredits']); // adjust employee leave credits
+
             });
         });
         /*
@@ -136,23 +172,6 @@ Route::middleware('auth')->group(function () {
         |--------------------------------------------------------------------------
         */
         Route::apiResource('employees', EmployeeController::class);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Employee Documents (Unified REST Resource)
-        |--------------------------------------------------------------------------
-        */
-        Route::prefix('documents')->group(function () {
-
-            // List all documents (filterable)
-            Route::get('/', [DocumentController::class, 'index']);
-
-            // View specific document
-            Route::get('{document}', [DocumentController::class, 'show']);
-
-            // Download
-            Route::get('{document}/download', [DocumentController::class, 'download']);
-        });
 
         /*
         |--------------------------------------------------------------------------
@@ -189,6 +208,24 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [RequestController::class, 'index']);
             Route::get('{leaveRequest}', [RequestController::class, 'show']);
             Route::put('{leaveRequest}/review', [RequestController::class, 'review']);
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | Attendance Management (Admin/Manager)
+        |--------------------------------------------------------------------------
+        */
+        Route::prefix('attendance')->group(function () {
+            // All attendance records
+            Route::get('/', [AttendanceController::class, 'index']);
+
+            // Today's attendance overview
+            Route::get('/today', [AttendanceController::class, 'todayOverview']);
+
+            // Specific employee attendance
+            Route::prefix('employees/{employee}')->group(function () {
+                Route::get('/', [AttendanceController::class, 'showEmployeeAttendance']);
+            });
         });
     });
 });

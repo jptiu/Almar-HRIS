@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\PasswordGenerator;
 use App\Http\Requests\EmployeeRequest;
-use App\Http\Resources\UserResource;
+use App\Http\Resources\EmployeeResource;
 use App\Models\Employee;
 use App\Models\User;
 use App\Models\Role;
@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Log;
 class EmployeeController extends Controller
 {
     /**
-     * Display a listing of employees.
+     * Display a listing of the employees.
      */
     public function index(Request $request): JsonResponse
     {
@@ -32,11 +32,13 @@ class EmployeeController extends Controller
 
         $employees = Employee::applyFilters($request, $query);
 
-        $users = $employees->map(fn($employee) => $employee->user);
+        $employees->getCollection()->transform(function ($employee) {
+            return new EmployeeResource($employee);
+        });
 
         return $this->success([
-            'employees' => UserResource::collection($users)
-        ], 'Employees retrieved successfully.');
+            'employees' => $employees
+        ],'Employees retrieved successfully.');
     }
 
     /**
@@ -104,11 +106,10 @@ class EmployeeController extends Controller
             DB::commit();
 
             return $this->created([
-                'employee' => new UserResource($employee->user),
+                'employee' => new EmployeeResource($employee),
                 'generated_password' => $password,
                 'password_note' => 'Password was auto-generated. Please share this securely.',
             ], 'Employee created successfully.');
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -135,7 +136,7 @@ class EmployeeController extends Controller
         ]);
 
         return $this->success([
-            'employee' => new UserResource($employee->user)
+            'employee' => new EmployeeResource($employee)
         ], 'Employee retrieved successfully.');
     }
 
@@ -210,9 +211,8 @@ class EmployeeController extends Controller
             DB::commit();
 
             return $this->success([
-                'employee' => new UserResource($employee->user)
+                'employee' => new EmployeeResource($employee)
             ], 'Employee updated successfully.');
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -239,7 +239,6 @@ class EmployeeController extends Controller
             DB::commit();
 
             return $this->success(null, 'Employee deleted successfully.');
-
         } catch (\Exception $e) {
             DB::rollBack();
 
