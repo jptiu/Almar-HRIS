@@ -6,6 +6,8 @@ use App\Helpers\PasswordGenerator;
 use App\Http\Requests\EmployeeRequest;
 use App\Http\Resources\EmployeeResource;
 use App\Models\Employee;
+use App\Models\EmployeeProbationDetail;
+use App\Models\EmployeeStatus;
 use App\Models\User;
 use App\Models\Role;
 use Illuminate\Http\JsonResponse;
@@ -27,7 +29,8 @@ class EmployeeController extends Controller
             'department',
             'company',
             'branch',
-            'status'
+            'status',
+            'probationDetail'
         ]);
 
         $employees = Employee::applyFilters($request, $query);
@@ -96,6 +99,21 @@ class EmployeeController extends Controller
                 ])
             ]);
 
+            // Create probation details if probationary status is selected
+            if ($request->filled('employee_status_id')) {
+                $probationStatus = EmployeeStatus::find($request->employee_status_id);
+                if ($probationStatus && $probationStatus->name === 'Probationary') {
+                    EmployeeProbationDetail::create([
+                        'employee_id' => $employee->id,
+                        'probation_start_date' => $request->probation_start_date,
+                        'probation_end_date' => $request->probation_end_date,
+                        'performance_criteria' => $request->performance_criteria,
+                        'probation_status' => $request->probation_status ?? EmployeeProbationDetail::STATUS_PENDING,
+                        'probation_notes' => $request->probation_notes,
+                    ]);
+                }
+            }
+
             $employee->load([
                 'user.roles',
                 'company',
@@ -132,7 +150,8 @@ class EmployeeController extends Controller
             'department',
             'company',
             'branch',
-            'status'
+            'status',
+            'probationDetail'
         ]);
 
         return $this->success([
@@ -201,6 +220,40 @@ class EmployeeController extends Controller
                 'base_salary',
             ]));
 
+            // Handle probation details update
+            if ($request->filled('employee_status_id')) {
+                $newStatus = EmployeeStatus::find($request->employee_status_id);
+                
+                if ($newStatus && $newStatus->name === 'Probationary') {
+                    // Check if probation detail already exists
+                    $existingProbation = $employee->probationDetail;
+                    
+                    if ($existingProbation) {
+                        // Update existing probation details
+                        $existingProbation->update([
+                            'probation_start_date' => $request->probation_start_date ?? $existingProbation->probation_start_date,
+                            'probation_end_date' => $request->probation_end_date ?? $existingProbation->probation_end_date,
+                            'performance_criteria' => $request->performance_criteria ?? $existingProbation->performance_criteria,
+                            'probation_status' => $request->probation_status ?? $existingProbation->probation_status,
+                            'probation_notes' => $request->probation_notes ?? $existingProbation->probation_notes,
+                        ]);
+                    } else {
+                        // Create new probation details
+                        EmployeeProbationDetail::create([
+                            'employee_id' => $employee->id,
+                            'probation_start_date' => $request->probation_start_date,
+                            'probation_end_date' => $request->probation_end_date,
+                            'performance_criteria' => $request->performance_criteria,
+                            'probation_status' => $request->probation_status ?? EmployeeProbationDetail::STATUS_PENDING,
+                            'probation_notes' => $request->probation_notes,
+                        ]);
+                    }
+                }
+            }
+
+            // Load probation detail for response
+            $employee->load('probationDetail');
+
             $employee->load([
                 'user.roles',
                 'company',
@@ -250,3 +303,4 @@ class EmployeeController extends Controller
         }
     }
 }
+
