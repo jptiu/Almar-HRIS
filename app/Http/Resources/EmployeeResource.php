@@ -67,6 +67,21 @@ class EmployeeResource extends JsonResource
 
             /*
             |--------------------------------------------------------------------------
+            | Probation Details (only populated when status is Probationary)
+            |--------------------------------------------------------------------------
+            */
+            'probation_detail' => $this->when($this->status?->name === 'Probationary', function () {
+                return [
+                    'probation_start_date' => $this->probationDetail?->probation_start_date,
+                    'probation_end_date' => $this->probationDetail?->probation_end_date,
+                    'performance_criteria' => $this->probationDetail?->performance_criteria,
+                    'probation_status' => $this->probationDetail?->probation_status,
+                    'probation_notes' => $this->probationDetail?->probation_notes,
+                ];
+            }),
+
+            /*
+            |--------------------------------------------------------------------------
             | Timestamps
             |--------------------------------------------------------------------------
             */

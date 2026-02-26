@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Models\EmployeeProbationDetail;
+use App\Models\EmployeeStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
@@ -52,6 +54,13 @@ class EmployeeRequest extends FormRequest
             'base_salary' => 'nullable|numeric|min:0',
             'is_manager' => 'nullable|boolean',
             'manager_id' => 'nullable|exists:employees,id',
+
+            // Probation details (conditionally required when status is Probationary)
+            'probation_start_date' => 'nullable|date',
+            'probation_end_date' => 'nullable|date|after_or_equal:probation_start_date',
+            'performance_criteria' => 'nullable|string',
+            'probation_status' => 'nullable|in:' . implode(',', EmployeeProbationDetail::getStatuses()),
+            'probation_notes' => 'nullable|string',
         ];
     }
 
@@ -106,6 +115,23 @@ class EmployeeRequest extends FormRequest
 
                 if (!$branchExists) {
                     $validator->errors()->add('branch_id', 'The selected branch does not belong to the specified company.');
+                }
+            }
+
+            // Check if employee_status_id is Probationary and validate probation dates
+            if ($this->employee_status_id) {
+                $probationaryStatus = EmployeeStatus::find($this->employee_status_id);
+                
+                if ($probationaryStatus && $probationaryStatus->name === 'Probationary') {
+                    // Probation start date is required when status is Probationary
+                    if (!$this->probation_start_date) {
+                        $validator->errors()->add('probation_start_date', 'Probation start date is required for Probationary employees.');
+                    }
+                    
+                    // Probation end date is required when status is Probationary
+                    if (!$this->probation_end_date) {
+                        $validator->errors()->add('probation_end_date', 'Probation end date is required for Probationary employees.');
+                    }
                 }
             }
         });

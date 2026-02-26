@@ -169,4 +169,12 @@ class Employee extends Model
     {
         return $this->hasMany(Attendance::class);
     }
+
+    /**
+     * Get the probation details for this employee.
+     */
+    public function probationDetail()
+    {
+        return $this->hasOne(EmployeeProbationDetail::class);
+    }
 }
