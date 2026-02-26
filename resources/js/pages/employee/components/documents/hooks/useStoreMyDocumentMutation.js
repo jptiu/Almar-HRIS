@@ -35,6 +35,8 @@ export const useStoreMyDocumentMutation = () => {
     onSuccess: () => {
       toast.success("Document uploaded successfully.");
       queryClient.invalidateQueries({ queryKey: ["myDocuments"] });
+      queryClient.invalidateQueries({ queryKey: ["myDocumentTypes"] });
+      queryClient.invalidateQueries({ queryKey: ["myDocumentTypeFiles"] });
     },
     onError: (error) => {
       toast.error(getErrorMessage(error));

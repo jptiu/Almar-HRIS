@@ -17,7 +17,7 @@ import {
     SelectValue,
 } from "@/components/ui/Select";
 import { ActionsMenu } from "@/components/common";
-import { FileText, Trash2, Download, User, Folder } from "lucide-react";
+import { FileText, Trash2, Download, Folder, Pencil } from "lucide-react";
 import dayjs from "dayjs";
 import {
     useFetchMyDocumentsQuery,
@@ -25,7 +25,7 @@ import {
     useDownloadMyDocument,
 } from "./hooks";
 
-export const MyDocumentsTable = ({ setDeleteTarget }) => {
+export const MyDocumentsTable = ({ setDeleteTarget, setEditTarget }) => {
     const [page, setPage] = useState(1);
     const [perPage, setPerPage] = useState(10);
     const [search, setSearch] = useState("");
@@ -80,6 +80,11 @@ export const MyDocumentsTable = ({ setDeleteTarget }) => {
                             loadingLabel: "Downloading...",
                         },
                         {
+                            label: "Update",
+                            icon: <Pencil className="w-4 h-4" />,
+                            onClick: setEditTarget,
+                        },
+                        {
                             label: "Delete",
                             icon: <Trash2 className="w-4 h-4" />,
                             onClick: setDeleteTarget,
@@ -100,7 +105,9 @@ export const MyDocumentsTable = ({ setDeleteTarget }) => {
                         All Documents
                     </CardTitle>
                 </div>
-                <CardDescription className={"mb-8"}>Your uploaded documents for HR records</CardDescription>
+                <CardDescription className={"mb-8"}>
+                    Your uploaded documents for HR records
+                </CardDescription>
 
                 {/* Search bar */}
                 <div className="flex items-center gap-3 flex-wrap justify-end">

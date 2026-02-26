@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, InputField } from "@/components/ui";
 import Modal, { ModalFooter } from "@/components/ui/Modal";
 import {
@@ -12,11 +12,12 @@ import { UploadCloud } from "lucide-react";
 import {
     useFetchDocumentTypesQuery,
     useStoreMyDocumentMutation,
+    useUpdateMyDocumentMutation,
 } from "./hooks";
 
 const ACCEPTED_EXTENSIONS = ".pdf,.jpg,.jpeg,.png,.doc,.docx";
 
-export const UploadDocumentModal = ({ isOpen, onClose }) => {
+export const UploadDocumentModal = ({ isOpen, onClose, editTarget = null }) => {
     const [description, setDescription] = useState("");
     const [documentTypeId, setDocumentTypeId] = useState("");
     const [file, setFile] = useState(null);
@@ -25,6 +26,11 @@ export const UploadDocumentModal = ({ isOpen, onClose }) => {
 
     const { data: documentTypesData } = useFetchDocumentTypesQuery();
     const uploadMutation = useStoreMyDocumentMutation();
+    const updateMutation = useUpdateMyDocumentMutation();
+    const isEditMode = Boolean(editTarget?.id);
+    const isSubmitting = isEditMode
+        ? updateMutation.isPending
+        : uploadMutation.isPending;
 
     const resetForm = () => {
         setDescription("");
@@ -36,8 +42,29 @@ export const UploadDocumentModal = ({ isOpen, onClose }) => {
         }
     };
 
+    useEffect(() => {
+        if (!isOpen) return;
+
+        if (isEditMode) {
+            setDescription(editTarget?.description || "");
+            setDocumentTypeId(
+                String(
+                    editTarget?.document_type_id ||
+                        editTarget?.document_type?.id ||
+                        "",
+                ),
+            );
+            setFile(
+                editTarget?.file_name ? { name: editTarget.file_name } : null,
+            );
+            return;
+        }
+
+        resetForm();
+    }, [editTarget, isEditMode, isOpen]);
+
     const handleClose = () => {
-        if (uploadMutation.isPending) return;
+        if (isSubmitting) return;
         resetForm();
         onClose();
     };
@@ -50,7 +77,24 @@ export const UploadDocumentModal = ({ isOpen, onClose }) => {
     const handleSubmit = (event) => {
         event.preventDefault();
 
-        if (!description.trim() || !documentTypeId || !file) {
+        if (!description.trim() || !documentTypeId || (!isEditMode && !file)) {
+            return;
+        }
+
+        if (isEditMode) {
+            updateMutation.mutate(
+                {
+                    document: editTarget.id,
+                    description: description.trim(),
+                    document_type_id: documentTypeId,
+                },
+                {
+                    onSuccess: () => {
+                        handleClose();
+                    },
+                },
+            );
+
             return;
         }
 
@@ -72,7 +116,7 @@ export const UploadDocumentModal = ({ isOpen, onClose }) => {
         <Modal
             isOpen={isOpen}
             onClose={handleClose}
-            title="Upload Document"
+            title={isEditMode ? "Update Document" : "Upload Document"}
             size="md"
         >
             <form className="space-y-4" onSubmit={handleSubmit}>
@@ -110,19 +154,29 @@ export const UploadDocumentModal = ({ isOpen, onClose }) => {
                     <div
                         role="button"
                         tabIndex={0}
-                        onClick={() => fileInputRef.current?.click()}
+                        onClick={() => {
+                            if (!isEditMode) {
+                                fileInputRef.current?.click();
+                            }
+                        }}
                         onKeyDown={(event) => {
+                            if (isEditMode) return;
                             if (event.key === "Enter" || event.key === " ") {
                                 event.preventDefault();
                                 fileInputRef.current?.click();
                             }
                         }}
                         onDragOver={(event) => {
+                            if (isEditMode) return;
                             event.preventDefault();
                             setIsDragging(true);
                         }}
-                        onDragLeave={() => setIsDragging(false)}
+                        onDragLeave={() => {
+                            if (isEditMode) return;
+                            setIsDragging(false);
+                        }}
                         onDrop={(event) => {
+                            if (isEditMode) return;
                             event.preventDefault();
                             setIsDragging(false);
                             const droppedFile = event.dataTransfer.files?.[0];
@@ -132,14 +186,18 @@ export const UploadDocumentModal = ({ isOpen, onClose }) => {
                             isDragging
                                 ? "border-blue-500 bg-blue-50"
                                 : "border-gray-300 hover:border-gray-400 bg-gray-50"
-                        }`}
+                        } ${isEditMode ? "opacity-70 cursor-not-allowed" : ""}`}
                     >
                         <UploadCloud className="w-8 h-8 text-gray-500 mb-2" />
                         <p className="text-sm font-medium text-gray-700">
-                            Drag and drop a file here
+                            {isEditMode
+                                ? "Current file is locked"
+                                : "Drag and drop a file here"}
                         </p>
                         <p className="text-xs text-gray-500 mt-1">
-                            or click to browse
+                            {isEditMode
+                                ? "File cannot be changed when updating"
+                                : "or click to browse"}
                         </p>
                         {file && (
                             <p className="text-xs text-gray-700 mt-3">
@@ -153,6 +211,7 @@ export const UploadDocumentModal = ({ isOpen, onClose }) => {
                         type="file"
                         accept={ACCEPTED_EXTENSIONS}
                         className="hidden"
+                        disabled={isEditMode}
                         onChange={(event) =>
                             handleFileSelect(event.target.files?.[0])
                         }
@@ -167,20 +226,26 @@ export const UploadDocumentModal = ({ isOpen, onClose }) => {
                         type="button"
                         variant="outline"
                         onClick={handleClose}
-                        disabled={uploadMutation.isPending}
+                        disabled={isSubmitting}
                     >
                         Cancel
                     </Button>
                     <Button
                         type="submit"
                         disabled={
-                            uploadMutation.isPending ||
+                            isSubmitting ||
                             !description.trim() ||
                             !documentTypeId ||
-                            !file
+                            (!isEditMode && !file)
                         }
                     >
-                        {uploadMutation.isPending ? "Uploading..." : "Upload"}
+                        {isSubmitting
+                            ? isEditMode
+                                ? "Updating..."
+                                : "Uploading..."
+                            : isEditMode
+                              ? "Update"
+                              : "Upload"}
                     </Button>
                 </ModalFooter>
             </form>

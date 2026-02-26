@@ -1,20 +1,20 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteMyDocument } from "../api";
 import toast from "react-hot-toast";
+import { updateMyDocument } from "../api";
 
-export const useDeleteMyDocumentMutation = () => {
+export const useUpdateMyDocumentMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (documentId) => deleteMyDocument(documentId),
+    mutationFn: (payload) => updateMyDocument(payload),
     onSuccess: () => {
-      toast.success("Document deleted successfully.");
+      toast.success("Document updated successfully.");
       queryClient.invalidateQueries({ queryKey: ["myDocuments"] });
       queryClient.invalidateQueries({ queryKey: ["myDocumentTypes"] });
       queryClient.invalidateQueries({ queryKey: ["myDocumentTypeFiles"] });
     },
-    onError: () => {
-      toast.error("Failed to delete document.");
+    onError: (error) => {
+      toast.error(error?.response?.data?.message || "Failed to update document.");
     },
   });
 };

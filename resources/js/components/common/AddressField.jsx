@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { InputField } from "@/components/ui";
 import {
     Select,
@@ -8,11 +8,10 @@ import {
     SelectValue,
 } from "@/components/ui/Select";
 import {
-    provinces,
-    cities,
-    barangays,
-    regions,
-} from "select-philippines-address";
+    fetchProvinces,
+    fetchCities,
+    fetchBarangays,
+} from "@/lib/addressCache";
 import { cn } from "@/lib/utils";
 
 export const AddressField = ({ formData, onChange, getFieldError }) => {
@@ -37,94 +36,59 @@ export const AddressField = ({ formData, onChange, getFieldError }) => {
         return selectedCity?.city_code || "";
     };
 
-    const getUniqueByKey = (items, keyName) => {
-        const uniqueMap = new Map();
+    useEffect(() => {
+        let cancelled = false;
 
-        (items || []).forEach((item) => {
-            const keyValue = item?.[keyName];
-
-            if (keyValue && !uniqueMap.has(keyValue)) {
-                uniqueMap.set(keyValue, item);
+        fetchProvinces().then((uniqueProvinces) => {
+            if (!cancelled) {
+                setAllProvinces(uniqueProvinces);
+                setProvinceOptions(uniqueProvinces);
             }
         });
 
-        return Array.from(uniqueMap.values());
-    };
-
-    useEffect(() => {
-        const loadProvinces = async () => {
-            try {
-                const regionList = await regions();
-                const provinceListByRegion = await Promise.all(
-                    (regionList || []).map((region) =>
-                        provinces(region.region_code),
-                    ),
-                );
-
-                const flattenedProvinces = provinceListByRegion
-                    .flat()
-                    .sort((a, b) =>
-                        a.province_name.localeCompare(b.province_name),
-                    );
-
-                const uniqueProvinces = getUniqueByKey(
-                    flattenedProvinces,
-                    "province_code",
-                );
-
-                setAllProvinces(uniqueProvinces);
-                setProvinceOptions(uniqueProvinces);
-            } catch (error) {
-                setAllProvinces([]);
-                setProvinceOptions([]);
-            }
+        return () => {
+            cancelled = true;
         };
-
-        loadProvinces();
     }, []);
 
     useEffect(() => {
-        const loadCities = async () => {
-            const provinceCode = findProvinceCodeByName(formData.state);
+        let cancelled = false;
+        const provinceCode = findProvinceCodeByName(formData.state);
 
-            if (!provinceCode) {
-                setCityOptions([]);
-                return;
-            }
-
-            try {
-                const cityList = await cities(provinceCode);
-                setCityOptions(getUniqueByKey(cityList, "city_code"));
-            } catch (error) {
-                setCityOptions([]);
-            }
-        };
-
-        if (allProvinces.length) {
-            loadCities();
+        if (!provinceCode) {
+            setCityOptions([]);
+            return;
         }
+
+        fetchCities(provinceCode).then((cityList) => {
+            if (!cancelled) {
+                setCityOptions(cityList);
+            }
+        });
+
+        return () => {
+            cancelled = true;
+        };
     }, [formData.state, allProvinces]);
 
     useEffect(() => {
-        const loadBarangays = async () => {
-            const cityCode = findCityCodeByName(formData.city);
+        let cancelled = false;
+        const cityCode = findCityCodeByName(formData.city);
 
-            if (!cityCode) {
-                setBarangayOptions([]);
-                return;
-            }
-
-            try {
-                const barangayList = await barangays(cityCode);
-                setBarangayOptions(getUniqueByKey(barangayList, "brgy_code"));
-            } catch (error) {
-                setBarangayOptions([]);
-            }
-        };
-
-        if (cityOptions.length) {
-            loadBarangays();
+        if (!cityCode) {
+            setBarangayOptions([]);
+            return;
         }
+
+        fetchBarangays(cityCode).then((barangayList) => {
+            if (!cancelled) {
+                setBarangayOptions(barangayList);
+            }
+        });
+
+        return () => {
+            cancelled = true;
+        };
     }, [formData.city, cityOptions]);
 
     return (

@@ -9,6 +9,12 @@ import { Plus } from "lucide-react";
 export const MyDocuments = () => {
     const [deleteTarget, setDeleteTarget] = useState(null);
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+    const [editTarget, setEditTarget] = useState(null);
+
+    const handleCloseDocumentModal = () => {
+        setIsUploadModalOpen(false);
+        setEditTarget(null);
+    };
 
     return (
         <div className="space-y-6 animate-fade-in">
@@ -23,18 +29,27 @@ export const MyDocuments = () => {
                     </p>
                 </div>
 
-                <Button onClick={() => setIsUploadModalOpen(true)}>
+                <Button
+                    onClick={() => {
+                        setEditTarget(null);
+                        setIsUploadModalOpen(true);
+                    }}
+                >
                     <Plus className="h-4 w-4" /> Upload Documents
                 </Button>
             </div>
 
             <DocumentFolders />
 
-            <MyDocumentsTable setDeleteTarget={setDeleteTarget} />
+            <MyDocumentsTable
+                setDeleteTarget={setDeleteTarget}
+                setEditTarget={setEditTarget}
+            />
 
             <UploadDocumentModal
-                isOpen={isUploadModalOpen}
-                onClose={() => setIsUploadModalOpen(false)}
+                isOpen={isUploadModalOpen || Boolean(editTarget)}
+                onClose={handleCloseDocumentModal}
+                editTarget={editTarget}
             />
 
             <DeleteDocumentModal
