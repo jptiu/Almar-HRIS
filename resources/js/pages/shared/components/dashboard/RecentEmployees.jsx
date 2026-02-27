@@ -44,7 +44,7 @@ export function RecentEmployees() {
             </CardHeader>
 
             <CardContent className="space-y-6">
-                {employees?.map((emp) => {
+                {(employees ?? []).slice(0, 5).map((emp) => {
                     const initials = getInitials(emp.firstName, emp.lastName);
                     const color = getColorFromName(
                         emp.firstName + emp.lastName,
