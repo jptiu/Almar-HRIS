@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Button } from "@/components/ui";
-import Modal, { ModalFooter } from "@/components/ui/Modal";
+import Drawer, { DrawerFooter } from "@/components/ui/Drawer";
 import { FileText } from "lucide-react";
 import { useFetchEmployeeDocumentTypesQuery } from "./hooks";
 
@@ -35,7 +35,7 @@ const getEmployeeName = (employee) => {
     return fullName || "Employee";
 };
 
-export const EmployeeDocumentModal = ({ isOpen, onClose, employee }) => {
+export const EmployeeDocumentDrawer = ({ isOpen, onClose, employee }) => {
     const employeeId = employee?.employeeId;
 
     const { data, isLoading, isFetching } =
@@ -46,7 +46,7 @@ export const EmployeeDocumentModal = ({ isOpen, onClose, employee }) => {
     const employeeName = getEmployeeName(employee);
 
     return (
-        <Modal
+        <Drawer
             isOpen={isOpen}
             onClose={onClose}
             title={`${employeeName} Documents`}
@@ -65,26 +65,26 @@ export const EmployeeDocumentModal = ({ isOpen, onClose, employee }) => {
                     </p>
                 </div>
             ) : categories.length ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                     {categories.map((category) => (
-                        <div
+                        <button
                             key={category.id}
-                            className="rounded-xl border border-slate-200 bg-white p-4 text-center"
+                            className="flex flex-col items-center text-center p-2 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer"
                         >
-                            <div className="mx-auto w-40 h-40 flex items-center justify-center">
+                            <div className="w-16 h-16 flex items-center justify-center">
                                 <img
                                     src="/images/folder.svg"
                                     alt="Document folder"
                                     className="w-full h-full object-contain"
                                 />
                             </div>
-                            <p className="mt-2 text-xl font-semibold text-text-dark leading-tight">
+                            <p className="mt-2 text-sm font-medium text-text-dark leading-tight">
                                 {category.name}
                             </p>
-                            <p className="mt-1 text-2xl font-semibold text-text-tertiary">
+                            <p className="text-xs text-text-tertiary">
                                 {category.count} File(s)
                             </p>
-                        </div>
+                        </button>
                     ))}
                 </div>
             ) : (
@@ -100,12 +100,6 @@ export const EmployeeDocumentModal = ({ isOpen, onClose, employee }) => {
                     </p>
                 </div>
             )}
-
-            <ModalFooter>
-                <Button variant="outline" onClick={onClose}>
-                    Close
-                </Button>
-            </ModalFooter>
-        </Modal>
+        </Drawer>
     );
 };

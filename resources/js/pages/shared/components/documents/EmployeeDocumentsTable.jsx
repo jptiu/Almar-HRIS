@@ -27,7 +27,7 @@ import {
 
 export const EmployeeDocumentsTable = ({
     setSelectedEmployee,
-    setIsDocumentModalOpen,
+    setIsDocumentDrawerOpen,
 }) => {
     const [page, setPage] = useState(1);
     const [perPage, setPerPage] = useState(10);
@@ -54,7 +54,7 @@ export const EmployeeDocumentsTable = ({
     const resolveEmployeeId = (row) =>
         row?.employee_id ?? row?.id ?? row?.employee?.id ?? null;
 
-    const handleOpenDocumentModal = (row) => {
+    const handleOpenDocumentDrawer = (row) => {
         const employeeId = resolveEmployeeId(row);
 
         if (!employeeId) return;
@@ -63,7 +63,7 @@ export const EmployeeDocumentsTable = ({
             ...row,
             employeeId,
         });
-        setIsDocumentModalOpen(true);
+        setIsDocumentDrawerOpen(true);
     };
 
     const columns = [
@@ -123,7 +123,7 @@ export const EmployeeDocumentsTable = ({
                     variant="outline"
                     size="sm"
                     className="text-text-tertiary hover:text-text-dark"
-                    onClick={() => handleOpenDocumentModal(row)}
+                    onClick={() => handleOpenDocumentDrawer(row)}
                 >
                     <Eye className="w-4 h-4" />
                     <span>View Documents</span>

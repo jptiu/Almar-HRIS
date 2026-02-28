@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { EmployeeDocumentsTable } from "./EmployeeDocumentsTable";
-import { EmployeeDocumentModal } from "./EmployeeDocumentModal";
+import { EmployeeDocumentDrawer } from "./EmployeeDocumentDrawer";
 
 export const Documents = () => {
     const [selectedEmployee, setSelectedEmployee] = useState(null);
-    const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
+    const [isDocumentDrawerOpen, setIsDocumentDrawerOpen] = useState(false);
 
-    const handleCloseDocumentModal = () => {
-        setIsDocumentModalOpen(false);
+    const handleCloseDocumentDrawer = () => {
+        setIsDocumentDrawerOpen(false);
         setSelectedEmployee(null);
     };
 
@@ -26,12 +26,12 @@ export const Documents = () => {
 
             <EmployeeDocumentsTable
                 setSelectedEmployee={setSelectedEmployee}
-                setIsDocumentModalOpen={setIsDocumentModalOpen}
+                setIsDocumentDrawerOpen={setIsDocumentDrawerOpen}
             />
 
-            <EmployeeDocumentModal
-                isOpen={isDocumentModalOpen}
-                onClose={handleCloseDocumentModal}
+            <EmployeeDocumentDrawer
+                isOpen={isDocumentDrawerOpen}
+                onClose={handleCloseDocumentDrawer}
                 employee={selectedEmployee}
             />
         </div>
