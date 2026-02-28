@@ -5,6 +5,7 @@ export * from "./StatCard";
 export { Button, buttonVariants } from "./button";
 export { default as InputField } from './InputField';
 export { default as Modal } from './Modal';
+export { default as Drawer } from './Drawer';
 export { DataTable } from './DataTable';
 export { Pagination } from './Pagination';
 export { Progress } from './Progress';
